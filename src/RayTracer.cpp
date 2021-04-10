@@ -39,8 +39,60 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
 
+		if (depth >= 10 + 1) return vec3f(0.0, 0.0, 0.0);
+
 		const Material& m = i.getMaterial();
-		return m.shade(scene, r, i);
+		vec3f intersection = r.at(i.t);
+
+		// Shadow rays
+		vec3f intensity = m.shade(scene, r, i);
+
+		// Reflected ray
+		if (!m.kr.iszero()) {
+			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
+			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+		}
+
+		// Refracted ray
+		if (!m.kt.iszero()) {
+			double ni, nt;
+			vec3f Nr = i.N;	// Normal exclusively for refraction
+			bool isExiting = false;
+			bool isTLR = false;
+			// When ray is entering the object, the dot product between the ray and the normal should be positive
+			// This is because the normal always point OUTWARDS FROM the surface
+			if ((-r.getDirection()).dot(i.N) > 0) {
+				ni = 1.0;
+				nt = m.index;
+			// Conversely, when ray is exiting the object, the dot product between the ray and the noraml should be negative
+			} else {
+				ni = m.index;
+				nt = 1.0;
+				isExiting = true;
+			}
+			if (isExiting) {
+				Nr = -Nr;
+			}
+
+			// Check if total internal reflection occurs
+			if (ni >= nt) {
+				double thetac = asin(nt / ni);
+				double thetai = acos((-r.getDirection()).dot(Nr));
+				if (thetai > thetac) isTLR = true;
+			}
+
+			// Only refract if total internal reflection doesnt occur (which is addressed by reflected ray)
+			if (!isTLR) {
+				double sinnt = (ni / nt) * sin(acos((-r.getDirection().dot(Nr))));
+				vec3f refractDir = (((-r.getDirection()).dot(Nr) * Nr - (-r.getDirection())).normalize() * (sqrt(1 + sinnt * sinnt) * sinnt) - Nr).normalize();
+				vec3f ir = traceRay(scene, ray(intersection, refractDir), thresh, depth + 1);
+				intensity += vec3f(m.kt[0] * ir[0], m.kt[1] * ir[1], m.kt[2] * ir[2]);
+			}
+
+		}
+
+		return intensity.clamp();
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
