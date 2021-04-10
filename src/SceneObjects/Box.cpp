@@ -3,72 +3,76 @@
 
 #include "Box.h"
 
-double min(double a, double b) {
-    return (a < b) ? a : b;
-}
-
-double max(double a, double b) {
-    return (a > b) ? a : b;
-}
-
 bool Box::intersectLocal( const ray& r, isect& i ) const
 {
 	// YOUR CODE HERE:
     // Add box intersection code here.
 	// it currently ignores all boxes and just returns false.
-    vec3f p = r.getPosition();
+    
     vec3f d = r.getDirection();
-    
-    // Unlike square where the plane normal must originate from (0, 0, 0),
-    // There are 6 planes, with their respective normal situating in either:
-    //  (0.5, 0, 0),    (-0.5, 0, 0),
-    //  (0, 0.5, 0),    (0, -0.5, 0),
-    //  (0, 0, 0.5),    (0, 0, -0.5)
-    double tx0 = (-p[0] - 0.5) / d[0];
-    double tx1 = (-p[0] + 0.5) / d[0];
-    double ty0 = (-p[1] - 0.5) / d[1];
-    double ty1 = (-p[1] + 0.5) / d[1];
-    double tz0 = (-p[2] - 0.5) / d[2];
-    double tz1 = (-p[2] + 0.5) / d[2];
+    vec3f p = r.getPosition();
 
-    double txmin = min(tx0, tx1);
-    double txmax = max(tx0, tx1);
-    double tymin = min(ty0, ty1);
-    double tymax = max(ty0, ty1);
-    double tzmin = min(tz0, tz1);
-    double tzmax = max(tz0, tz1);
+    // Algorithm modified from the given hints
+    double tfar = 999999999;
+    double tnear = -tfar;
+    vec3f nnear = vec3f(0, 0, 0);
+    vec3f nfar = vec3f(0, 0, 0);
 
-    double tmin = txmin;    // These 2 variables stores the t value of intersecting either the x-, y- or z- min/max plane
-    double tmax = txmax;    
+    // Perform square intersection test on all 3 axes
+    // Uses the given Square.cpp for reference
+    for (int i = 0; i < 3; ++i) {
+        // Check for invalid rays (i.e. Rays parallel to both planes in the given axis)
+        if (d[i] == 0.0) {
+            // A ray that is parallel to one plane does not mean it is also parallel to other planes (because 6 planes are oriented in 3 different axes)
+            // An extent check is needed to confirm if this ray must not intersect with planes oriented in other axes
+            if (p[i] < -0.5 || p[i] > 0.5) {
+                return false;
+            }
+        }
 
-    // If we do NOT consider bounding area (i.e. no extent check), then we can determin valid and invalid intersections using:
-    // (1) For a valid intersection, a ray must first intersect with the plane closest to it (min plane), then the plane furtherest to it (max plane)
-    // (2) Conversely for an invalid intersection, a ray will first intersect with a max plane then a min plane (this only occurs when out-of-bound,)
+        // Attempt to intersect both the near and far plane in the given axis
+        // t1 stands for the near plane and t2 stands for the far plane
+        // n1 and n2 stands for their respective normal
+        vec3f n1 = vec3f(0, 0, 0);
+        vec3f n2 = vec3f(0, 0, 0);
 
+        double t1 = (-p[i] - 0.5) / d[i];
+        double t2 = (-p[i] + 0.5) / d[i];
+        n1[i] = -1.0;   // Since the planes are axis-oriented, their normal must have direction in that given axis
+        n2[i] = 1.0;    // Trivially, the near plane should have a normal pointing TOWARDS us, while the far plane should have a normal pointing AWAY FROM us
 
-    // Test 1: x- and y-planes intersection
-    // Check for invalid intersection
-    if ((tymax < tmin) || (tmax < tymin)) return false;
-    // Check for valid intersection
-    if (tymin > tmin) tmin = tymin;
-    if (tymax < tmax) tmax = tymax;
+        // Ensures t1, n1 represent the near plane and vice versa for t2, n2
+        if (t1 > t2) {
+            double temp = t1;
+            t1 = t2;
+            t2 = temp;
+            temp = n1[i];
+            n1[i] = n2[i];
+            n2[i] = temp;
+        }
 
-    // Test 2: ?- and z-planes intersection (? because after Test 1, tmin/tmax either stores x- or y-plane's values)
-    // Cehck for invalid intersection
-    if ((tzmax < tmin) || (tmax < tzmin)) return false;
-    // Check for valid intersection
-    if (tzmin > tmin) tmin = tzmin;
-    if (tzmax < tmax) tmax = tzmax;
-    
-    // Ray intersect passes all tests, there must exist valid intersection
+        // The far plane should be as close to us as possible (otherwise it would go to the scene's FAR constant (i.e. infinite distance)
+        if (t2 < tfar) {
+            tfar = t2;
+            nfar = n2;
+        }
+
+        // Conversely, the same logic goes for the near plane
+        if (t1 > tnear) {
+            tnear = t1;
+            nnear = n1;
+        }
+        
+        // Final check for t value
+        // (1) tfar < tnear is impossible by definition, so this is an invalid case
+        // (2) tfar < RAY_EPSILON essentially means t < 0, which means the intersection is behind the COP, so this is an invalid case
+        if (tfar < tnear || tfar < RAY_EPSILON) {
+            return false;
+        }
+    }
+
     i.obj = this;
-    i.t = tmin;
-    if (tmin == tx0) i.N = vec3f(-1.0, 0.0, 0.0);
-    else if (tmin == tx1) i.N = vec3f(1.0, 0.0, 0.0);
-    else if (tmin == ty0) i.N = vec3f(0.0, -1.0, 0.0);
-    else if (tmin == ty1) i.N = vec3f(0.0, 1.0, 0.0);
-    else if (tmin == tz0) i.N = vec3f(0.0, 0.0, -1.0);
-    else i.N = vec3f(0.0, 0.0, 1.0);
-
+    i.t = tnear;
+    i.N = nnear;
     return true;
 }
