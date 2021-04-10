@@ -13,7 +13,14 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
-    return vec3f(1,1,1);
+	vec3f d = -getDirection(P); // Direction from the point to light (instead of from the light to point)
+	ray r = ray(P, d);
+	isect i;
+	if (scene->intersect(r, i)) {
+		return vec3f(0, 0, 0);
+	}
+
+	return vec3f(1, 1, 1);
 }
 
 vec3f DirectionalLight::getColor( const vec3f& P ) const
@@ -69,6 +76,18 @@ void PointLight::setQuadAtten(double x)
 vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
     // YOUR CODE HERE:
-    // You should implement shadow-handling code here.
+    // You should implement shadow-handling code here.	
+	vec3f d = (position - P).normalize(); // Direction from the point to light (instead of from the light to point)
+	ray r = ray(P, d);
+	isect i;
+	if (scene->intersect(r, i)) {
+		vec3f intersection = r.at(i.t);
+		double lightDistance = (P - position).length();
+		double objectDisstance = (intersection - position).length();
+		if (objectDisstance < lightDistance) {
+			return vec3f(0, 0, 0);
+		}
+	}
+
     return vec3f(1,1,1);
 }
