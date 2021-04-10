@@ -13,15 +13,23 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
-	
 	vec3f d = getDirection(P); // Direction from the point to light (instead of from the light to point)
+	vec3f atten = getColor(P);
 	ray r = ray(P, d);
 	isect i;
-	if (scene->intersect(r, i)) {
-		return i.getMaterial().kt;
+
+	// Keep doing intersection test from P to the light source (denoted by ray r) until there is no more intersection
+	// Whenever r intersects with a TRANSPARENT object, multiply the current attenuation by that object's transmissive coefficient
+
+	while (scene->intersect(r, i)) {
+		Material m = i.getMaterial();
+		if (m.kt.iszero()) return vec3f(0, 0, 0);
+		if (isnan(i.t)) return vec3f(0, 0, 0); // A bug with the given intersect function causes this, I can do nothing but give up shading this pixel
+		atten = vec3f(atten[0] * m.kt[0], atten[1] * m.kt[1], atten[2] * m.kt[2]);
+		r = ray(r.at(i.t), d);
 	}
 
-	return vec3f(1, 1, 1);
+	return atten;
 }
 
 vec3f DirectionalLight::getColor( const vec3f& P ) const
@@ -77,18 +85,21 @@ void PointLight::setQuadAtten(double x)
 vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
     // YOUR CODE HERE:
-    // You should implement shadow-handling code here.	
-	vec3f d = (position - P).normalize(); // Direction from the point to light (instead of from the light to point)
+    // You should implement shadow-handling code here.
+	vec3f d = getDirection(P); // Direction from the point to light (instead of from the light to point)
+	vec3f atten = getColor(P);
 	ray r = ray(P, d);
 	isect i;
-	if (scene->intersect(r, i)) {
-		vec3f intersection = r.at(i.t);
-		double lightDistance = (P - position).length();
-		double objectDisstance = (intersection - position).length();
-		if (objectDisstance < lightDistance) {
-			return i.getMaterial().kt;
-		}
+
+	// Keep doing intersection test from P to the light source (denoted by ray r) until there is no more intersection
+	// Whenever r intersects with a TRANSPARENT object, multiply the current attenuation by that object's transmissive coefficient
+	while (scene->intersect(r, i)) {
+		Material m = i.getMaterial();
+		if (m.kt.iszero()) return vec3f(0, 0, 0);
+		if (isnan(i.t)) return vec3f(0, 0, 0); // A bug with the given intersect function causes this, I can do nothing but give up shading this pixel
+		atten = vec3f(atten[0] * m.kt[0], atten[1] * m.kt[1], atten[2] * m.kt[2]);
+		r = ray(r.at(i.t), d);
 	}
 
-    return vec3f(1,1,1);
+	return atten;
 }
