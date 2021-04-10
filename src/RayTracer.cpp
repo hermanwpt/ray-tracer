@@ -39,8 +39,24 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
 
+		if (depth >= 10 + 1) return vec3f(0.0, 0.0, 0.0);
+
 		const Material& m = i.getMaterial();
-		return m.shade(scene, r, i);
+		vec3f intersection = r.at(i.t);
+
+		// Shadow rays
+		vec3f intensity = m.shade(scene, r, i);
+
+		// Reflected ray
+		if (!m.kr.iszero()) {
+			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
+			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+		}
+
+		// Refracted ray
+
+		return intensity.clamp();
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color

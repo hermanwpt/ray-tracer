@@ -137,6 +137,16 @@ Scene::~Scene()
 	}
 }
 
+vec3f Scene::getAmbientIntensity()
+{
+	return ia;
+}
+
+void Scene::setAmbientIntensity(vec3f x)
+{	
+	ia = x.clamp();
+}
+
 // Get any intersection with an object.  Return information about the 
 // intersection through the reference parameter.
 bool Scene::intersect( const ray& r, isect& i ) const
