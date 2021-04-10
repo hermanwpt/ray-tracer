@@ -251,7 +251,9 @@ public:
 
 public:
 	Scene() 
-		: transformRoot(), objects(), lights() {}
+		: transformRoot(), objects(), lights() {
+		ia = vec3f(0.25, 0.25, 0.25);
+	}
 	virtual ~Scene();
 
 	void add( Geometry* obj )
@@ -261,6 +263,9 @@ public:
 	}
 	void add( Light* light )
 	{ lights.push_back( light ); }
+
+	vec3f getAmbientIntensity();
+	void setAmbientIntensity(vec3f x);
 
 	bool intersect( const ray& r, isect& i ) const;
 	void initScene();
@@ -278,6 +283,8 @@ private:
 	list<Geometry*> boundedobjects;
     list<Light*> lights;
     Camera camera;
+
+	vec3f ia;
 	
 	// Each object in the scene, provided that it has hasBoundingBoxCapability(),
 	// must fall within this bounding box.  Objects that don't have hasBoundingBoxCapability()
