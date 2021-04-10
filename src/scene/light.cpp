@@ -13,7 +13,8 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
-	vec3f d = -getDirection(P); // Direction from the point to light (instead of from the light to point)
+	
+	vec3f d = getDirection(P); // Direction from the point to light (instead of from the light to point)
 	ray r = ray(P, d);
 	isect i;
 	if (scene->intersect(r, i)) {
