@@ -92,6 +92,16 @@ void TraceUI::cb_depthSlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nDepth=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+void TraceUI::cb_thresholdSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nThreshold = double(((Fl_Slider*)o)->value());
+}
+
+void TraceUI::cb_SSAASlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nSSAASize = int(((Fl_Slider*)o)->value());
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -174,6 +184,42 @@ void TraceUI::cb_stop(Fl_Widget* o, void* v)
 	done=true;
 }
 
+void TraceUI::cb_SSAAButton(Fl_Widget* o, void* v)
+{
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
+	((TraceUI*)(o->user_data()))->m_nSSAA = bool(((Fl_Light_Button*)o)->value());
+	if (pUI->m_nSSAA) {
+		pUI->m_SSAASlider->activate();
+		pUI->m_adaptiveSSAAButton->deactivate();
+		pUI->m_jitterButton->activate();
+	} else {
+		pUI->m_SSAASlider->deactivate();
+		pUI->m_adaptiveSSAAButton->activate();
+		pUI->m_jitterButton->deactivate();
+	}
+}
+
+void TraceUI::cb_adaptiveSSAAButton(Fl_Widget* o, void* v)
+{
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
+	((TraceUI*)(o->user_data()))->m_nAdaptiveSSAA = bool(((Fl_Light_Button*)o)->value());
+	if (pUI->m_nAdaptiveSSAA) {
+		pUI->m_SSAASlider->activate();
+		pUI->m_SSAAButton->deactivate();
+		pUI->m_jitterButton->activate();
+	}
+	else {
+		pUI->m_SSAASlider->deactivate();
+		pUI->m_SSAAButton->activate();
+		pUI->m_jitterButton->deactivate();
+	}
+}
+
+void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nJitter = bool(((Fl_Light_Button*)o)->value());
+}
+
 void TraceUI::show()
 {
 	m_mainWindow->show();
@@ -195,6 +241,31 @@ int TraceUI::getDepth()
 	return m_nDepth;
 }
 
+int TraceUI::getSSAASize()
+{
+	return m_nSSAASize;
+}
+
+double TraceUI::getThreshold()
+{
+	return m_nThreshold;
+}
+
+bool TraceUI::isSSAA()
+{
+	return m_nSSAA;
+}
+
+bool TraceUI::isAdaptiveSSAA()
+{
+	return m_nAdaptiveSSAA;
+}
+
+bool TraceUI::isJitter()
+{
+	return m_nJitter;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -214,7 +285,12 @@ TraceUI::TraceUI() {
 	// init.
 	m_nDepth = 0;
 	m_nSize = 150;
-	m_mainWindow = new Fl_Window(100, 40, 320, 100, "Ray <Not Loaded>");
+	m_nSSAASize = 1;
+	m_nThreshold = 0.0;
+	m_nSSAA = false;
+	m_nAdaptiveSSAA = false;
+	m_nJitter = false;
+	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
@@ -245,6 +321,58 @@ TraceUI::TraceUI() {
 		m_sizeSlider->value(m_nSize);
 		m_sizeSlider->align(FL_ALIGN_RIGHT);
 		m_sizeSlider->callback(cb_sizeSlides);
+
+		// install slider threshold
+		m_thresholdSlider = new Fl_Value_Slider(10, 80, 180, 20, "Threshold");
+		m_thresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_thresholdSlider->type(FL_HOR_NICE_SLIDER);
+		m_thresholdSlider->labelfont(FL_COURIER);
+		m_thresholdSlider->labelsize(12);
+		m_thresholdSlider->minimum(0.0);
+		m_thresholdSlider->maximum(1.0);
+		m_thresholdSlider->step(0.01);
+		m_thresholdSlider->value(m_nThreshold);
+		m_thresholdSlider->align(FL_ALIGN_RIGHT);
+		m_thresholdSlider->callback(cb_thresholdSlides);
+
+		// install button SSAA
+		m_SSAAButton = new Fl_Light_Button(10, 105, 60, 20, "SSAA");
+		m_SSAAButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_SSAAButton->labelfont(FL_COURIER);
+		m_SSAAButton->labelsize(12);
+		m_SSAAButton->value(m_nSSAA);
+		m_SSAAButton->callback(cb_SSAAButton);
+
+		// install button adaptive SSAA
+		m_adaptiveSSAAButton = new Fl_Light_Button(80, 105, 120, 20, "Adaptive SSAA");
+		m_adaptiveSSAAButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_adaptiveSSAAButton->labelfont(FL_COURIER);
+		m_adaptiveSSAAButton->labelsize(12);
+		m_adaptiveSSAAButton->value(m_nAdaptiveSSAA);
+		m_adaptiveSSAAButton->callback(cb_adaptiveSSAAButton);
+
+		// install button jitter
+		m_jitterButton = new Fl_Light_Button(210, 105, 60, 20, "Jitter");
+		m_jitterButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_jitterButton->labelfont(FL_COURIER);
+		m_jitterButton->labelsize(12);
+		m_jitterButton->value(m_nJitter);
+		m_jitterButton->callback(cb_jitterButton);
+		m_jitterButton->deactivate();
+
+		// install slider SSAA size	
+		m_SSAASlider = new Fl_Value_Slider(10, 130, 180, 20, "SSAA Sample Size");
+		m_SSAASlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_SSAASlider->type(FL_HOR_NICE_SLIDER);
+		m_SSAASlider->labelfont(FL_COURIER);
+		m_SSAASlider->labelsize(12);
+		m_SSAASlider->minimum(1);
+		m_SSAASlider->maximum(5);
+		m_SSAASlider->step(1);
+		m_SSAASlider->value(m_nSSAASize);
+		m_SSAASlider->align(FL_ALIGN_RIGHT);
+		m_SSAASlider->callback(cb_SSAASlides);
+		m_SSAASlider->deactivate();
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
