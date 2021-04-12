@@ -199,15 +199,35 @@ void RayTracer::traceLines( int start, int stop )
 
 void RayTracer::tracePixel( int i, int j )
 {
-	vec3f col;
+	vec3f col = vec3f(0, 0, 0);
 
 	if( !scene )
 		return;
 
 	double x = double(i)/double(buffer_width);
 	double y = double(j)/double(buffer_height);
+	if (traceUI->isSSAA()) {
+		int n = traceUI->getSSAASize();
+		double subPixelSize = (1 / double(buffer_height)) / n;
+		bool jitter = traceUI->isJitter();
 
-	col = trace( scene,x,y );
+		for (int a = 0; a < n; ++a) {
+			for (int b = 0; b < n; ++b) {
+				if (!jitter) col += trace(scene, x + a * subPixelSize, y + b * subPixelSize);
+				else {
+					double xJitter = (-rand() / RAND_MAX) * subPixelSize;
+					double yJitter = (-rand() / RAND_MAX) * subPixelSize;
+					col += trace(scene, x + a * subPixelSize + xJitter, y + b * subPixelSize + yJitter);
+				}
+			}
+		}
+		col = col / (n * n);
+	} else if (traceUI->isAdaptiveSSAA()) {
+
+	} else {
+		col = trace(scene, x, y);
+	}
+	
 
 	unsigned char *pixel = buffer + ( i + j * buffer_width ) * 3;
 

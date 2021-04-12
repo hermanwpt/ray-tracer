@@ -29,9 +29,14 @@ public:
 	Fl_Slider*			m_sizeSlider;
 	Fl_Slider*			m_depthSlider;
 	Fl_Slider*			m_thresholdSlider;
+	Fl_Slider*			m_SSAASlider;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
+
+	Fl_Light_Button*	m_SSAAButton;
+	Fl_Light_Button*	m_adaptiveSSAAButton;
+	Fl_Light_Button*	m_jitterButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -42,14 +47,26 @@ public:
 
 	int			getSize();
 	int			getDepth();
+	int			getSSAASize();
+
 	double		getThreshold();
+
+	bool		isSSAA();
+	bool		isAdaptiveSSAA();
+	bool		isJitter();
 
 private:
 	RayTracer*	raytracer;
 
 	int			m_nSize;
 	int			m_nDepth;
+	int			m_nSSAASize;
+
 	double		m_nThreshold;
+
+	bool		m_nSSAA;
+	bool		m_nAdaptiveSSAA;
+	bool		m_nJitter;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -66,9 +83,14 @@ private:
 	static void cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_thresholdSlides(Fl_Widget* o, void* v);
+	static void cb_SSAASlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
+
+	static void cb_SSAAButton(Fl_Widget* o, void* v);
+	static void cb_adaptiveSSAAButton(Fl_Widget* o, void* v);
+	static void cb_jitterButton(Fl_Widget* o, void* v);
 };
 
 #endif
