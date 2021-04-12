@@ -44,11 +44,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		if (depth >= traceUI->getDepth() + 1) return vec3f(0.0, 0.0, 0.0);
 
+		double threshold = traceUI->getThreshold();
 		const Material& m = i.getMaterial();
 		vec3f intersection = r.at(i.t);
 
 		// Shadow rays
 		vec3f intensity = m.shade(scene, r, i);
+		if ((intensity[0] < threshold) && (intensity[1] < threshold) && (intensity[2] < threshold)) return intensity;
 
 		// Reflected ray
 		if (!m.kr.iszero()) {
