@@ -42,7 +42,7 @@ public:
 		: Light( scene, color ), position( pos ) {
 		constantAtten = 0.0;
 		linearAtten = 0.0;
-		quadAtten = 0.05;
+		quadAtten = 0.25;
 	}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
 	virtual double distanceAttenuation( const vec3f& P ) const;
