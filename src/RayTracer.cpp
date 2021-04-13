@@ -2,6 +2,8 @@
 
 #include <Fl/fl_ask.h>
 
+#include "fileio/bitmap.h"
+
 #include "RayTracer.h"
 #include "scene/light.h"
 #include "scene/material.h"
@@ -101,13 +103,41 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// it according to the background color, which in this (simple) case
 		// is just black.
 
-		return vec3f( 0.0, 0.0, 0.0 );
+		if (bg) {
+			// This part essentially reverts Camera::rayThrough( double x, double y, ray &r ) to retrieve x and y,
+			// which is the normalized screen coodrinates ranging from [0, 1] by performing perspective transformation
+			// back to the image plane
+			Camera* cam = scene->getCamera();
+
+			// See "3D Transformations" lecture notes for notations
+			vec3f u = cam->getU();			// The "X"
+			vec3f v = cam->getV();			// The "Y"
+			vec3f look = cam->getLook();	// The "Z"
+			vec3f d = r.getDirection();
+
+			double DX = d.dot(u);		// D = Focal length = |d|cos(theta) and X = |u|, so d.u gives DX
+			double DY = d.dot(v);		// The same logic but Y = |v|, so d.v gives DY
+			double DZ = d.dot(look);	// The same logic but Z = |look|, so d.look gives DZ
+
+			int x = (DX / DZ) * bgWidth + bgWidth / 2 + 0.5;			// I don't know why + bgWidth / 2 is needed but only 1/4 of the background image is shown on the top-right quadrant
+			int y = (DY / DZ) * bgHeight + bgHeight / 2 + 0.5;		// of the rendered image when I run the code without this term. The same goes for + bgHeight / 2. 
+
+			// I actually don't know why I need to check the lower and upper bounds of texture space coordinates
+			// They are not supposed to fall outside the valid range but I encountered segmentation error anyway
+			// So I hardcoded this constraint to prevent crashing lol
+			if ((x < 0) || (x >= bgWidth) || (y < 0) || (y >= bgHeight)) return vec3f(0, 0, 0);
+
+			return vec3f(bg[3 * (y * bgWidth + x)] / 256.0, bg[3 * (y * bgWidth + x) + 1] / 256.0, bg[3 * (y * bgWidth + x) + 2] / 256.0);
+		} else {
+			return vec3f(0.0, 0.0, 0.0);
+		}
 	}
 }
 
 RayTracer::RayTracer()
 {
 	buffer = NULL;
+	bg = NULL;
 	buffer_width = buffer_height = 256;
 	scene = NULL;
 
@@ -165,6 +195,36 @@ bool RayTracer::loadScene( char* fn )
 	// Add any specialized scene loading code here
 	
 	m_bSceneLoaded = true;
+
+	return true;
+}
+
+bool RayTracer::loadBackgroundImage(char* fn)
+{
+	unsigned char* data;
+	unsigned char* another_data;
+	int	width, height;
+
+	// Attempt to read file
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		return false;
+	}
+
+	// Make sure the background image is of aspect ratio 1:1
+	if (width != height) {
+		fl_alert("Background image must have aspect ratio of 1:1");
+		return false;
+	}
+
+	// Release old storage for the old background image
+	if (bg) delete[] bg;
+
+	// Update background image size
+	bgWidth = width;
+	bgHeight = height;
+
+	bg = data;
 
 	return true;
 }
