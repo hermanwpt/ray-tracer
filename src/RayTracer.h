@@ -23,14 +23,17 @@ public:
 	void tracePixel( int i, int j );
 
 	bool loadScene( char* fn );
+	bool loadBackgroundImage( char* fn );
 
 	bool sceneLoaded();
 
 private:
-	unsigned char *buffer;
+	unsigned char* buffer;
+	unsigned char* bg;
 	int buffer_width, buffer_height;
+	int bgWidth, bgHeight;
 	int bufferSize;
-	Scene *scene;
+	Scene* scene;
 
 	bool m_bSceneLoaded;
 };
