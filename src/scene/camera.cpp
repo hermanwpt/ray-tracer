@@ -83,6 +83,21 @@ Camera::setAspectRatio( double ar )
     update();
 }
 
+vec3f Camera::getU()
+{
+    return u;
+}
+
+vec3f Camera::getV()
+{
+    return v;
+}
+
+vec3f Camera::getLook()
+{
+    return look;
+}
+
 void
 Camera::update()
 {
