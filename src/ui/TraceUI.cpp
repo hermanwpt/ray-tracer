@@ -71,6 +71,18 @@ void TraceUI::cb_exit(Fl_Menu_* o, void* v)
 	pUI->m_mainWindow->hide();
 }
 
+void TraceUI::cb_set_shader_phong(Fl_Menu_* o, void* v)
+{
+	TraceUI* pUI = whoami(o);
+	pUI->raytracer->setShader(PHONG);
+}
+
+void TraceUI::cb_set_shader_toon(Fl_Menu_* o, void* v)
+{
+	TraceUI* pUI = whoami(o);
+	pUI->raytracer->setShader(TOON);
+}
+
 void TraceUI::cb_exit2(Fl_Widget* o, void* v) 
 {
 	TraceUI* pUI=(TraceUI *)(o->user_data());
@@ -282,6 +294,11 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image, 0, FL_MENU_DIVIDER },
 		{ "&Load Background Image...", FL_ALT + 'b', (Fl_Callback *)TraceUI::cb_load_background_image, 0, FL_MENU_DIVIDER }, 
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
+		{ 0 },
+
+	{ "&Shader",		0, 0, 0, FL_SUBMENU },
+		{ "&Phong Illumination Model",	FL_ALT + 'p', (Fl_Callback*)TraceUI::cb_set_shader_phong },
+		{ "&Cartoonish",	FL_ALT + 'c', (Fl_Callback*)TraceUI::cb_set_shader_toon },
 		{ 0 },
 
 	{ "&Help",		0, 0, 0, FL_SUBMENU },

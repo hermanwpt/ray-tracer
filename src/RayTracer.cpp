@@ -30,9 +30,19 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 vec3f RayTracer::traceRay( Scene *scene, const ray& r, 
 	const vec3f& thresh, int depth )
 {
+	switch (shader) {
+		case PHONG: return traceRayPhong(scene, r, thresh, depth); break;
+		case TOON: return traceRayToon(scene, r, thresh, depth); break;
+		default: break;
+	}
+	return vec3f(0, 0, 0);	// This shouldn't occur
+}
+
+vec3f RayTracer::traceRayPhong(Scene* scene, const ray& r,
+	const vec3f& thresh, int depth) {
 	isect i;
 
-	if( scene->intersect( r, i ) ) {
+	if (scene->intersect(r, i)) {
 		// YOUR CODE HERE
 
 		// An intersection occured!  We've got work to do.  For now,
@@ -51,7 +61,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f intersection = r.at(i.t);
 
 		// Shadow rays
-		vec3f intensity = m.shade(scene, r, i);
+		vec3f intensity = m.shadePhong(scene, r, i);
 		if ((intensity[0] < threshold) && (intensity[1] < threshold) && (intensity[2] < threshold)) return intensity;
 
 		// Reflected ray
@@ -71,8 +81,9 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			if ((-r.getDirection()).dot(i.N) >= 0) {
 				ni = 1.0;
 				nt = m.index;
-			// Conversely, when ray is exiting the object, the dot product between the ray and the noraml should be negative
-			} else {
+				// Conversely, when ray is exiting the object, the dot product between the ray and the noraml should be negative
+			}
+			else {
 				ni = m.index;
 				nt = 1.0;
 				Nr = -Nr;
@@ -97,8 +108,9 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		}
 
 		return intensity.clamp();
-	
-	} else {
+
+	}
+	else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
@@ -128,7 +140,102 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			if ((x < 0) || (x >= bgWidth) || (y < 0) || (y >= bgHeight)) return vec3f(0, 0, 0);
 
 			return vec3f(bg[3 * (y * bgWidth + x)] / 256.0, bg[3 * (y * bgWidth + x) + 1] / 256.0, bg[3 * (y * bgWidth + x) + 2] / 256.0);
-		} else {
+		}
+		else {
+			return vec3f(0.0, 0.0, 0.0);
+		}
+	}
+}
+
+vec3f RayTracer::traceRayToon(Scene* scene, const ray& r,
+	const vec3f& thresh, int depth) {
+	isect i;
+
+	if (scene->intersect(r, i)) {
+		if (depth >= traceUI->getDepth() + 1) return vec3f(0.0, 0.0, 0.0);
+
+		double threshold = traceUI->getThreshold();
+		const Material& m = i.getMaterial();
+		vec3f intersection = r.at(i.t);
+
+		// Shadow rays
+		vec3f intensity = m.shadeToon(scene, r, i);
+		if ((intensity[0] < threshold) && (intensity[1] < threshold) && (intensity[2] < threshold)) return intensity;
+
+		// Reflected ray
+		if (!m.kr.iszero()) {
+			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
+			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+		}
+
+		// Refracted ray
+		if (!m.kt.iszero()) {
+			double ni, nt;
+			vec3f Nr = i.N;	// Normal exclusively for refraction
+			bool isTLR = false;
+			// When ray is entering the object, the dot product between the ray and the normal should be positive
+			// This is because the normal always point OUTWARDS FROM the surface
+			if ((-r.getDirection()).dot(i.N) >= 0) {
+				ni = 1.0;
+				nt = m.index;
+				// Conversely, when ray is exiting the object, the dot product between the ray and the noraml should be negative
+			}
+			else {
+				ni = m.index;
+				nt = 1.0;
+				Nr = -Nr;
+			}
+
+			// Check if total internal reflection occurs
+			if (ni > nt) {
+				double thetac = asin(nt / ni);
+				double thetai = acos((-r.getDirection()).dot(Nr));
+				if (thetai > thetac) isTLR = true;
+			}
+
+			// Only refract if total internal reflection doesnt occur (which is addressed by reflected ray)
+			if (!isTLR) {
+				double sinnt = (ni / nt) * sin(acos((-r.getDirection().dot(Nr))));
+				vec3f refractDir = (((-r.getDirection()).dot(Nr) * Nr - (-r.getDirection())).normalize() * (sqrt(1 + sinnt * sinnt) * sinnt) - Nr).normalize();
+				if (sinnt <= NORMAL_EPSILON) refractDir = -Nr;
+				vec3f ir = traceRay(scene, ray(intersection, refractDir), thresh, depth + 1);
+				intensity += vec3f(m.kt[0] * ir[0], m.kt[1] * ir[1], m.kt[2] * ir[2]);
+			}
+
+		}
+
+		return intensity.clamp();
+
+	}
+	else {
+		if (bg) {
+			// This part essentially reverts Camera::rayThrough( double x, double y, ray &r ) to retrieve x and y,
+			// which is the normalized screen coodrinates ranging from [0, 1] by performing perspective transformation
+			// back to the image plane
+			Camera* cam = scene->getCamera();
+
+			// See "3D Transformations" lecture notes for notations
+			vec3f u = cam->getU();			// The "X"
+			vec3f v = cam->getV();			// The "Y"
+			vec3f look = cam->getLook();	// The "Z"
+			vec3f d = r.getDirection();
+
+			double DX = d.dot(u);		// D = Focal length = |d|cos(theta) and X = |u|, so d.u gives DX
+			double DY = d.dot(v);		// The same logic but Y = |v|, so d.v gives DY
+			double DZ = d.dot(look);	// The same logic but Z = |look|, so d.look gives DZ
+
+			int x = (DX / DZ) * bgWidth + bgWidth / 2 + 0.5;			// I don't know why + bgWidth / 2 is needed but only 1/4 of the background image is shown on the top-right quadrant
+			int y = (DY / DZ) * bgHeight + bgHeight / 2 + 0.5;		// of the rendered image when I run the code without this term. The same goes for + bgHeight / 2. 
+
+			// I actually don't know why I need to check the lower and upper bounds of texture space coordinates
+			// They are not supposed to fall outside the valid range but I encountered segmentation error anyway
+			// So I hardcoded this constraint to prevent crashing lol
+			if ((x < 0) || (x >= bgWidth) || (y < 0) || (y >= bgHeight)) return vec3f(0, 0, 0);
+
+			return vec3f(bg[3 * (y * bgWidth + x)] / 256.0, bg[3 * (y * bgWidth + x) + 1] / 256.0, bg[3 * (y * bgWidth + x) + 2] / 256.0);
+		}
+		else {
 			return vec3f(0.0, 0.0, 0.0);
 		}
 	}
@@ -140,6 +247,7 @@ RayTracer::RayTracer()
 	bg = NULL;
 	buffer_width = buffer_height = 256;
 	scene = NULL;
+	shader = PHONG;
 
 	m_bSceneLoaded = false;
 }
@@ -229,6 +337,11 @@ bool RayTracer::loadBackgroundImage(char* fn)
 	return true;
 }
 
+void RayTracer::setShader(int s)
+{
+	shader = s;
+}
+
 void RayTracer::traceSetup( int w, int h )
 {
 	if( buffer_width != w || buffer_height != h )
@@ -266,6 +379,7 @@ void RayTracer::tracePixel( int i, int j )
 
 	double x = double(i)/double(buffer_width);
 	double y = double(j)/double(buffer_height);
+
 	if (traceUI->isSSAA()) {
 		int n = traceUI->getSSAASize();
 		double subPixelSize = (1 / double(buffer_height)) / n;
