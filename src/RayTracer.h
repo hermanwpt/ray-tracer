@@ -6,6 +6,11 @@
 #include "scene/scene.h"
 #include "scene/ray.h"
 
+enum SHADER_TYPE {
+	PHONG,
+	TOON
+};
+
 class RayTracer
 {
 public:
@@ -14,7 +19,8 @@ public:
 
     vec3f trace( Scene *scene, double x, double y );
 	vec3f traceRay( Scene *scene, const ray& r, const vec3f& thresh, int depth );
-
+	vec3f traceRayPhong(Scene* scene, const ray& r, const vec3f& thresh, int depth);
+	vec3f traceRayToon(Scene* scene, const ray& r, const vec3f& thresh, int depth);
 
 	void getBuffer( unsigned char *&buf, int &w, int &h );
 	double aspectRatio();
@@ -25,6 +31,8 @@ public:
 	bool loadScene( char* fn );
 	bool loadBackgroundImage( char* fn );
 
+	void setShader(int s);
+
 	bool sceneLoaded();
 
 private:
@@ -34,6 +42,8 @@ private:
 	int bgWidth, bgHeight;
 	int bufferSize;
 	Scene* scene;
+
+	int shader;
 
 	bool m_bSceneLoaded;
 };
