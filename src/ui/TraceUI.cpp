@@ -60,6 +60,17 @@ void TraceUI::cb_load_background_image(Fl_Menu_* o, void* v)
 	}
 }
 
+void TraceUI::cb_load_texture_image(Fl_Menu_* o, void* v)
+{
+	TraceUI* pUI = whoami(o);
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", "");
+	if (newfile != NULL) {
+		pUI->raytracer->loadTextureImage(newfile);
+		pUI->m_textureMappingButton->activate();
+		pUI->m_bumpMappingButton->activate();
+	}
+}
+
 void TraceUI::cb_exit(Fl_Menu_* o, void* v)
 {
 	TraceUI* pUI=whoami(o);
@@ -246,9 +257,11 @@ void TraceUI::cb_textureMappingButton(Fl_Widget* o, void* v)
 	TraceUI* pUI = ((TraceUI*)(o->user_data()));
 	pUI->m_nTextureMapping = bool(((Fl_Light_Button*)o)->value());
 	if (pUI->m_nTextureMapping) {
+		pUI->raytracer->setToggledTexture(true);
 		pUI->m_bumpMappingButton->deactivate();
 	}
 	else {
+		pUI->raytracer->setToggledTexture(false);
 		pUI->m_bumpMappingButton->activate();
 	}
 }
@@ -258,9 +271,11 @@ void TraceUI::cb_bumpMappingButton(Fl_Widget* o, void* v)
 	TraceUI* pUI = ((TraceUI*)(o->user_data()));
 	pUI->m_nBumpMapping = bool(((Fl_Light_Button*)o)->value());
 	if (pUI->m_nBumpMapping) {
+		pUI->raytracer->setToggledTexture(true);
 		pUI->m_textureMappingButton->deactivate();
 	}
 	else {
+		pUI->raytracer->setToggledTexture(false);
 		pUI->m_textureMappingButton->activate();
 	}
 }
@@ -326,7 +341,8 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image, 0, FL_MENU_DIVIDER },
-		{ "&Load Background Image...", FL_ALT + 'b', (Fl_Callback *)TraceUI::cb_load_background_image, 0, FL_MENU_DIVIDER }, 
+		{ "&Load Background Image...", FL_ALT + 'b', (Fl_Callback *)TraceUI::cb_load_background_image, 0, }, 
+		{ "&Load Texture Image...", FL_ALT + 't', (Fl_Callback*)TraceUI::cb_load_texture_image, 0, FL_MENU_DIVIDER },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 
@@ -353,6 +369,7 @@ TraceUI::TraceUI() {
 	m_nJitter = false;
 	m_nTextureMapping = false;
 	m_nBumpMapping = false;
+	loadedTexture = false;
 	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -442,6 +459,7 @@ TraceUI::TraceUI() {
 		m_textureMappingButton->labelfont(FL_COURIER);
 		m_textureMappingButton->labelsize(12);
 		m_textureMappingButton->value(m_nTextureMapping);
+		m_textureMappingButton->deactivate();
 		m_textureMappingButton->callback(cb_textureMappingButton);
 
 		m_bumpMappingButton = new Fl_Light_Button(150, 155, 110, 20, "Bump Mapping");
@@ -449,6 +467,7 @@ TraceUI::TraceUI() {
 		m_bumpMappingButton->labelfont(FL_COURIER);
 		m_bumpMappingButton->labelsize(12);
 		m_bumpMappingButton->value(m_nBumpMapping);
+		m_bumpMappingButton->deactivate();
 		m_bumpMappingButton->callback(cb_bumpMappingButton);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");

@@ -32,7 +32,14 @@ vec3f Material::shadePhong( Scene *scene, const ray& r, const isect& i ) const
 		double diffuseDot = i.N.dot((*p)->getDirection(intersection));
 		if (diffuseDot < 0) diffuseDot = 0;
 
-		intensity += vec3f(atten[0] * (1 - kt[0]) * kd[0] * diffuseDot * ip[0], atten[1] * (1 - kt[1]) * kd[1] * diffuseDot * ip[1], atten[2] * (1 - kt[2]) * kd[2] * diffuseDot * ip[2]);
+		vec3f diffusekd = kd;
+		
+		if (scene->mappingTexture()) {
+			//cout << "HELLO" << endl;
+			diffusekd = ((MaterialSceneObject*)(i.obj))->mapTexture(intersection, scene->getTexture(), scene->getTextureWidth(), scene->getTextureHeight());
+		}
+
+		intensity += vec3f(atten[0] * (1 - kt[0]) * diffusekd[0] * diffuseDot * ip[0], atten[1] * (1 - kt[1]) * diffusekd[1] * diffuseDot * ip[1], atten[2] * (1 - kt[2]) * diffusekd[2] * diffuseDot * ip[2]);
 
 		// Specular term
 		vec3f reflectedRay = (2 * (*p)->getDirection(intersection).dot(i.N) * i.N - (*p)->getDirection(intersection)).normalize();

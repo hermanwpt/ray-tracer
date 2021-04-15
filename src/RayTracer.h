@@ -30,6 +30,9 @@ public:
 
 	bool loadScene( char* fn );
 	bool loadBackgroundImage( char* fn );
+	bool loadTextureImage( char* fn );
+
+	void setToggledTexture(bool toggled) { scene->setToggledTexture(toggled); }
 
 	void setShader(int s);
 

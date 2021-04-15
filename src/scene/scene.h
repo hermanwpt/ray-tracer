@@ -228,6 +228,7 @@ public:
 
 	virtual const Material& getMaterial() const { return *material; }
 	virtual void setMaterial( Material *m )	{ material = m; }
+	virtual vec3f mapTexture(const vec3f& intersection, unsigned char* texture, const int& width, const int& height) const { return material->kd; }
 
 protected:
 	MaterialSceneObject( Scene *scene, Material *mat ) 
@@ -261,6 +262,7 @@ public:
 		obj->ComputeBoundingBox();
 		objects.push_back( obj );
 	}
+
 	void add( Light* light )
 	{ lights.push_back( light ); }
 
@@ -275,7 +277,17 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
-	
+	void setTextureData(unsigned char* texture, int width, int height, bool mappedTexture) { this->texture = texture; this->textureWidth = width; this->textureHeight = height; this->mappedTexture = mappedTexture; }
+
+	void setToggledTexture(bool toggled) { toggledTexture = toggled; }
+
+	unsigned char* getTexture() const { return texture; }
+
+	int getTextureWidth() const { return textureWidth; }
+
+	int getTextureHeight() const { return textureHeight; }
+
+	bool mappingTexture() const { return toggledTexture; }
 
 private:
     list<Geometry*> objects;
@@ -290,6 +302,11 @@ private:
 	// must fall within this bounding box.  Objects that don't have hasBoundingBoxCapability()
 	// are exempt from this requirement.
 	BoundingBox sceneBounds;
+
+	unsigned char* texture = NULL;
+	int textureWidth = -1, textureHeight = -1;
+	bool mappedTexture = false;
+	bool toggledTexture = false;
 };
 
 #endif // __SCENE_H__

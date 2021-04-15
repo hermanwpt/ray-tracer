@@ -256,6 +256,7 @@ RayTracer::RayTracer()
 RayTracer::~RayTracer()
 {
 	delete [] buffer;
+	if (bg) delete[] bg;
 	delete scene;
 }
 
@@ -333,6 +334,24 @@ bool RayTracer::loadBackgroundImage(char* fn)
 	bgHeight = height;
 
 	bg = data;
+
+	return true;
+}
+
+bool RayTracer::loadTextureImage(char* fn)
+{
+	unsigned char* data;
+	unsigned char* another_data;
+	int	width, height;
+
+	// Attempt to read file
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		return false;
+	}
+
+	// Update background image size
+	scene->setTextureData(data, width, height, true);
 
 	return true;
 }
