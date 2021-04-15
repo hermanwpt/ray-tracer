@@ -251,6 +251,16 @@ void TraceUI::cb_softShadowButton(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nSoftShadow = bool(((Fl_Light_Button*)o)->value());
 }
 
+void TraceUI::cb_DOFButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nDOF = bool(((Fl_Light_Button*)o)->value());
+}
+
+void TraceUI::cb_motionBlurButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nMotionBlur = bool(((Fl_Light_Button*)o)->value());
+}
+
 void TraceUI::show()
 {
 	m_mainWindow->show();
@@ -307,6 +317,16 @@ bool TraceUI::isSoftShadow()
 	return m_nSoftShadow;
 }
 
+bool TraceUI::isDOF()
+{
+	return m_nDOF;
+}
+
+bool TraceUI::isMotionBlur()
+{
+	return m_nMotionBlur;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -339,7 +359,9 @@ TraceUI::TraceUI() {
 	m_nJitter = false;
 	m_nGloss = false;
 	m_nSoftShadow = false;
-	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
+	m_nDOF = false;
+	m_nMotionBlur = false;
+	m_mainWindow = new Fl_Window(100, 40, 320, 240, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
@@ -438,6 +460,22 @@ TraceUI::TraceUI() {
 		m_softShadowButton->labelsize(12);
 		m_softShadowButton->value(m_nSoftShadow);
 		m_softShadowButton->callback(cb_softShadowButton);
+
+		// install button DOF
+		m_glossButton = new Fl_Light_Button(10, 180, 145, 20, "Depth of Field");
+		m_glossButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_glossButton->labelfont(FL_COURIER);
+		m_glossButton->labelsize(12);
+		m_glossButton->value(m_nDOF);
+		m_glossButton->callback(cb_DOFButton);
+
+		// install button motion blur
+		m_softShadowButton = new Fl_Light_Button(160, 180, 145, 20, "Motion Blur");
+		m_softShadowButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_softShadowButton->labelfont(FL_COURIER);
+		m_softShadowButton->labelsize(12);
+		m_softShadowButton->value(m_nMotionBlur);
+		m_softShadowButton->callback(cb_motionBlurButton);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
