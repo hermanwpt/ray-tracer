@@ -47,8 +47,8 @@ vec3f DirectionalLight::softShadowAttenuation(const vec3f& P) const
 			}
 		}
 	}
-	tempAtten += shadowAttenuation(P);
-	return tempAtten / 9;
+	// tempAtten += shadowAttenuation(P);	// Also attenuating the original shadow looks odd
+	return tempAtten / 8;
 }
 
 vec3f DirectionalLight::getColor( const vec3f& P ) const
@@ -138,6 +138,6 @@ vec3f PointLight::softShadowAttenuation(const vec3f& P) const
 			}
 		}
 	}
-	tempAtten += shadowAttenuation(P);
-	return tempAtten / 9;
+	// tempAtten += shadowAttenuation(P);	// Also attenuating the original shadow looks odd
+	return tempAtten / 8;
 }

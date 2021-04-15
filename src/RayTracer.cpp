@@ -67,8 +67,25 @@ vec3f RayTracer::traceRayPhong(Scene* scene, const ray& r,
 		// Reflected ray
 		if (!m.kr.iszero()) {
 			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
-			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
-			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			if (traceUI->isGloss()) {
+				vec3f ir = vec3f(0, 0, 0);
+				for (int j = -1; j <= 1; j += 2) {
+					for (int k = -1; k <= 1; k += 2) {
+						for (int l = -1; l <= 1; l += 2) {
+							vec3f distributeDir = (reflectDir + vec3f(0.06 * j * rand() / RAND_MAX, 0.06 * k * rand() / RAND_MAX, 0.06 * l * rand() / RAND_MAX)).normalize();
+							vec3f tempir = traceRay(scene, ray(intersection, distributeDir), thresh, depth + 1);
+							ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+						}
+					}
+				}
+				// vec3f tempir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);	// Also doing the original reflection makes the image look odd tbh
+				// ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+				intensity += ir / 8;
+			}
+			else {
+				vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+				intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			}
 		}
 
 		// Refracted ray
@@ -165,8 +182,25 @@ vec3f RayTracer::traceRayToon(Scene* scene, const ray& r,
 		// Reflected ray
 		if (!m.kr.iszero()) {
 			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
-			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
-			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			if (traceUI->isGloss()) {
+				vec3f ir = vec3f(0, 0, 0);
+				for (int j = -1; j <= 1; j += 2) {
+					for (int k = -1; k <= 1; k += 2) {
+						for (int l = -1; l <= 1; l += 2) {
+							vec3f distributeDir = (reflectDir + vec3f(0.06 * j * rand() / RAND_MAX, 0.06 * k * rand() / RAND_MAX, 0.06 * l * rand() / RAND_MAX)).normalize();
+							vec3f tempir = traceRay(scene, ray(intersection, distributeDir), thresh, depth + 1);
+							ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+						}
+					}
+				}
+				// vec3f tempir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);	// Also doing the original reflection makes the image look odd tbh
+				// ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+				intensity += ir / 8;
+			}
+			else {
+				vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+				intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			}
 		}
 
 		// Refracted ray
