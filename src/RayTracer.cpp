@@ -22,7 +22,22 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0 ).clamp();
+	// OpenGL transforms the entire scene to implement "camera movement"
+	// Likewise, we can transform the camera (or rather, all the rays beamed from the view plane) to implement "scene movement"
+	// Applying the same transformation to every ray from the view plane in each iteration is like moving the entire scene (hence simulating "movement")
+	if (traceUI->isMotionBlur()) {
+		vec3f intensity = vec3f(0, 0, 0);
+		for (int i = 0; i < 25; ++i) {
+			// Only rotate the camera in x-axis because doing all 3 axes at once is VERY blurry
+			ray tempRay = ray(r.getPosition(), (r.getDirection() + vec3f(0.004 * i, 0, 0)).normalize());
+			intensity += traceRay(scene, tempRay, vec3f(1.0, 1.0, 1.0), 0).clamp();
+		}
+		return intensity / 25;
+	} else if (traceUI->isDOF()) {
+
+	} else {
+		return traceRay(scene, r, vec3f(1.0, 1.0, 1.0), 0).clamp();
+	}
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
