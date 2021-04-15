@@ -13,6 +13,7 @@ point_light
 	colour = (0.8, 0.8, 0.8);
 }
 
+// SQUARE
 warn_model {
 	position = (1, 2, 1);
 	colour = (0.8, 0.8, 0.8);
@@ -21,6 +22,7 @@ warn_model {
 	shape = 0;
 }
 
+// TRIANGLE
 warn_model {
 	position = (-1, 2, -1);
 	colour = (0.8, 0.8, 0.8);
@@ -29,6 +31,7 @@ warn_model {
 	shape = 1;
 }
 
+// INNER EMPTY CIRCLE
 warn_model {
 	position = (-1, 2, 1);
 	colour = (0.8, 0.8, 0.8);
