@@ -29,12 +29,8 @@ vec3f Material::shadePhong( Scene *scene, const ray& r, const isect& i ) const
 	// Diffuse and specular term
 	for (list<Light*>::const_iterator p = scene->beginLights(); p != scene->endLights(); ++p) {
 		vec3f atten;
-		if (traceUI->isSoftShadow()) {
-			atten = ((*p)->distanceAttenuation(intersection) * (*p)->softShadowAttenuation(intersection)).clamp();
-		}
-		else {
-			atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
-		}
+		if (traceUI->isSoftShadow()) atten = ((*p)->distanceAttenuation(intersection) * (*p)->softShadowAttenuation(intersection)).clamp();
+		else atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
 		vec3f ip = (*p)->getColor(intersection);
 		
 		// Diffuse term
@@ -80,7 +76,9 @@ vec3f Material::shadeToon(Scene* scene, const ray& r, const isect& i) const
 
 	// Diffuse and specular term
 	for (list<Light*>::const_iterator p = scene->beginLights(); p != scene->endLights(); ++p) {
-		vec3f atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
+		vec3f atten;
+		if (traceUI->isSoftShadow()) atten = ((*p)->distanceAttenuation(intersection) * (*p)->softShadowAttenuation(intersection)).clamp();
+		else atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
 		vec3f ip = (*p)->getColor(intersection);
 
 		// Diffuse term
