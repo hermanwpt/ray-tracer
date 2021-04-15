@@ -570,7 +570,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec(getField(child, "position")), 
 			tupleToVec(getColorField(child)),
 			tupleToVec(getField(child, "direction")).normalize(),
-			tupleToVec(getField(child, "edgeplace"))));
+			getField(child, "angle")->getScalar()));
 	} else if (name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||

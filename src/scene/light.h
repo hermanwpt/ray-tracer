@@ -77,9 +77,8 @@ class SpotLight
 	: public Light
 {
 public:
-	SpotLight(Scene* scene, const vec3f& pos, const vec3f& color, const vec3f& d, const vec3f& ep)
-		: Light(scene, color), position(pos), direction{ d }, edgeplace{ ep } {
-		angle = edgeplace[0];
+	SpotLight(Scene* scene, const vec3f& pos, const vec3f& color, const vec3f& d, const double& ang)
+		: Light(scene, color), position(pos), direction{ d }, angle{ ang } {
 		constantAtten = 0.0;
 		linearAtten = 0.0;
 		quadAtten = 0.25;
@@ -92,11 +91,36 @@ public:
 protected:
 	vec3f position;
 	vec3f direction;
-	vec3f edgeplace;
 	double angle;
 	double constantAtten;
 	double linearAtten;
 	double quadAtten;
 };
+
+//class WarnModelLight
+//	: public Light
+//{
+//public:
+//	SpotLight(Scene* scene, const vec3f& pos, const vec3f& color, const vec3f& d, const vec3f& ep)
+//		: Light(scene, color), position(pos), direction{ d }, edgeplace{ ep } {
+//		angle = edgeplace[0];
+//		constantAtten = 0.0;
+//		linearAtten = 0.0;
+//		quadAtten = 0.25;
+//	}
+//	virtual vec3f shadowAttenuation(const vec3f& P) const;
+//	virtual double distanceAttenuation(const vec3f& P) const;
+//	virtual vec3f getColor(const vec3f& P) const;
+//	virtual vec3f getDirection(const vec3f& P) const;
+//
+//protected:
+//	vec3f position;
+//	vec3f direction;
+//	vec3f edgeplace;
+//	double angle;
+//	double constantAtten;
+//	double linearAtten;
+//	double quadAtten;
+//};
 
 #endif // __LIGHT_H__
