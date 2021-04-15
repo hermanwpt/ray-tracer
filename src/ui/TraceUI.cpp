@@ -241,6 +241,30 @@ void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nJitter = bool(((Fl_Light_Button*)o)->value());
 }
 
+void TraceUI::cb_textureMappingButton(Fl_Widget* o, void* v)
+{
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
+	pUI->m_nTextureMapping = bool(((Fl_Light_Button*)o)->value());
+	if (pUI->m_nTextureMapping) {
+		pUI->m_bumpMappingButton->deactivate();
+	}
+	else {
+		pUI->m_bumpMappingButton->activate();
+	}
+}
+
+void TraceUI::cb_bumpMappingButton(Fl_Widget* o, void* v)
+{
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
+	pUI->m_nBumpMapping = bool(((Fl_Light_Button*)o)->value());
+	if (pUI->m_nBumpMapping) {
+		pUI->m_textureMappingButton->deactivate();
+	}
+	else {
+		pUI->m_textureMappingButton->activate();
+	}
+}
+
 void TraceUI::show()
 {
 	m_mainWindow->show();
@@ -287,6 +311,16 @@ bool TraceUI::isJitter()
 	return m_nJitter;
 }
 
+bool TraceUI::isTextureMapping()
+{
+	return m_nTextureMapping;
+}
+
+bool TraceUI::isBumpMapping()
+{
+	return m_nBumpMapping;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -317,6 +351,8 @@ TraceUI::TraceUI() {
 	m_nSSAA = false;
 	m_nAdaptiveSSAA = false;
 	m_nJitter = false;
+	m_nTextureMapping = false;
+	m_nBumpMapping = false;
 	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -400,6 +436,20 @@ TraceUI::TraceUI() {
 		m_SSAASlider->align(FL_ALIGN_RIGHT);
 		m_SSAASlider->callback(cb_SSAASlides);
 		m_SSAASlider->deactivate();
+
+		m_textureMappingButton = new Fl_Light_Button(10, 155, 130, 20, "Texture Mapping");
+		m_textureMappingButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_textureMappingButton->labelfont(FL_COURIER);
+		m_textureMappingButton->labelsize(12);
+		m_textureMappingButton->value(m_nTextureMapping);
+		m_textureMappingButton->callback(cb_textureMappingButton);
+
+		m_bumpMappingButton = new Fl_Light_Button(150, 155, 110, 20, "Bump Mapping");
+		m_bumpMappingButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_bumpMappingButton->labelfont(FL_COURIER);
+		m_bumpMappingButton->labelsize(12);
+		m_bumpMappingButton->value(m_nBumpMapping);
+		m_bumpMappingButton->callback(cb_bumpMappingButton);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
