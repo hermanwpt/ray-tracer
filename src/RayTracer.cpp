@@ -351,7 +351,25 @@ bool RayTracer::loadTextureImage(char* fn)
 	}
 
 	// Update background image size
-	scene->setTextureData(data, width, height, true);
+	scene->setTextureData(data, width, height);
+
+	return true;
+}
+
+bool RayTracer::loadNormalImage(char* fn)
+{
+	unsigned char* data;
+	unsigned char* another_data;
+	int	width, height;
+
+	// Attempt to read file
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		return false;
+	}
+
+	// Update background image size
+	scene->setNormalData(data, width, height);
 
 	return true;
 }

@@ -229,6 +229,7 @@ public:
 	virtual const Material& getMaterial() const { return *material; }
 	virtual void setMaterial( Material *m )	{ material = m; }
 	virtual vec3f mapTexture(const vec3f& intersection, unsigned char* texture, const int& width, const int& height) const { return material->kd; }
+	virtual vec3f mapBumpTexture(const ray& ay, const isect& isect, const vec3f& intersection, unsigned char* bumpMap, const int& width, const int& height) const { return isect.N; }
 
 protected:
 	MaterialSceneObject( Scene *scene, Material *mat ) 
@@ -277,9 +278,17 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
-	void setTextureData(unsigned char* texture, int width, int height, bool mappedTexture) { this->texture = texture; this->textureWidth = width; this->textureHeight = height; this->mappedTexture = mappedTexture; }
+	// set data
+
+	void setTextureData(unsigned char* texture, int width, int height);
+
+	void setNormalData(unsigned char* normal, int width, int height);
 
 	void setToggledTexture(bool toggled) { toggledTexture = toggled; }
+
+	void setToggledNormal(bool toggled) { toggledNormal = toggled; }
+
+	// Accessor Member Functions
 
 	unsigned char* getTexture() const { return texture; }
 
@@ -288,6 +297,14 @@ public:
 	int getTextureHeight() const { return textureHeight; }
 
 	bool mappingTexture() const { return toggledTexture; }
+
+	unsigned char* getBumpMap() const { return bumpMap; }
+
+	int getBumpMapWidth() const { return bumpMapWidth; }
+
+	int getBumpMapHeight() const { return bumpMapHeight; }
+
+	bool hasNormalImg() const { return toggledNormal; }
 
 private:
     list<Geometry*> objects;
@@ -305,8 +322,11 @@ private:
 
 	unsigned char* texture = NULL;
 	int textureWidth = -1, textureHeight = -1;
-	bool mappedTexture = false;
 	bool toggledTexture = false;
+
+	unsigned char* bumpMap = NULL;
+	int bumpMapWidth = -1, bumpMapHeight = -1;
+	bool toggledNormal = false;
 };
 
 #endif // __SCENE_H__
