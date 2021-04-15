@@ -37,6 +37,8 @@ public:
 	Fl_Light_Button*	m_SSAAButton;
 	Fl_Light_Button*	m_adaptiveSSAAButton;
 	Fl_Light_Button*	m_jitterButton;
+	Fl_Light_Button*	m_textureMappingButton;
+	Fl_Light_Button*	m_bumpMappingButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -54,6 +56,8 @@ public:
 	bool		isSSAA();
 	bool		isAdaptiveSSAA();
 	bool		isJitter();
+	bool		isTextureMapping();
+	bool		isBumpMapping();
 
 private:
 	RayTracer*	raytracer;
@@ -67,6 +71,8 @@ private:
 	bool		m_nSSAA;
 	bool		m_nAdaptiveSSAA;
 	bool		m_nJitter;
+	bool		m_nTextureMapping;
+	bool		m_nBumpMapping;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -94,6 +100,8 @@ private:
 	static void cb_SSAAButton(Fl_Widget* o, void* v);
 	static void cb_adaptiveSSAAButton(Fl_Widget* o, void* v);
 	static void cb_jitterButton(Fl_Widget* o, void* v);
+	static void cb_textureMappingButton(Fl_Widget* o, void* v);
+	static void cb_bumpMappingButton(Fl_Widget* o, void* v);
 };
 
 #endif
