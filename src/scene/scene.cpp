@@ -135,6 +135,11 @@ Scene::~Scene()
 	for( l = lights.begin(); l != lights.end(); ++l ) {
 		delete (*l);
 	}
+
+	if (texture)
+		delete[] texture;
+	if (bumpMap)
+		delete[] bumpMap;
 }
 
 vec3f Scene::getAmbientIntensity()
@@ -208,4 +213,18 @@ void Scene::initScene()
 		else
 			nonboundedobjects.push_back(*j);
 	}
+}
+
+void Scene::setTextureData(unsigned char* texture, int width, int height)
+{ 
+	this->texture = texture;
+	this->textureWidth = width;
+	this->textureHeight = height;
+}
+
+void Scene::setNormalData(unsigned char* normal, int width, int height) 
+{ 
+	this->bumpMap = normal;
+	this->bumpMapWidth = width;
+	this->bumpMapHeight = height;
 }

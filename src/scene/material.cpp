@@ -38,6 +38,11 @@ vec3f Material::shadePhong( Scene *scene, const ray& r, const isect& i ) const
 			diffusekd = ((MaterialSceneObject*)(i.obj))->mapTexture(intersection, scene->getTexture(), scene->getTextureWidth(), scene->getTextureHeight());
 		}
 
+		if (scene->hasNormalImg()) {
+			diffuseDot = (((MaterialSceneObject*)(i.obj))->mapBumpTexture(r, i, intersection, scene->getBumpMap(), scene->getBumpMapWidth(), scene->getBumpMapHeight())).dot((*p)->getDirection(intersection));
+			if (diffuseDot < 0) diffuseDot = 0;
+		}
+
 		intensity += vec3f(atten[0] * (1 - kt[0]) * diffusekd[0] * diffuseDot * ip[0], atten[1] * (1 - kt[1]) * diffusekd[1] * diffuseDot * ip[1], atten[2] * (1 - kt[2]) * diffusekd[2] * diffuseDot * ip[2]);
 
 		// Specular term

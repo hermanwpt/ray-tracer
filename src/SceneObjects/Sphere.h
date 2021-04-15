@@ -15,6 +15,7 @@ public:
 	virtual bool intersectLocal( const ray& r, isect& i ) const;
 	virtual bool hasBoundingBoxCapability() const { return true; }
 	virtual vec3f mapTexture(const vec3f& intersection, unsigned char* texture, const int& width, const int& height) const override;
+	virtual vec3f mapBumpTexture(const ray& ray, const isect& isect, const vec3f& intersection, unsigned char* bumpMap, const int& width, const int& height) const override;
 
     virtual BoundingBox ComputeLocalBoundingBox()
     {
