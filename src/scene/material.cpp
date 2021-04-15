@@ -35,7 +35,6 @@ vec3f Material::shadePhong( Scene *scene, const ray& r, const isect& i ) const
 		vec3f diffusekd = kd;
 		
 		if (scene->mappingTexture()) {
-			//cout << "HELLO" << endl;
 			diffusekd = ((MaterialSceneObject*)(i.obj))->mapTexture(intersection, scene->getTexture(), scene->getTextureWidth(), scene->getTextureHeight());
 		}
 
