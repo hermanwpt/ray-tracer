@@ -571,6 +571,16 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec(getColorField(child)),
 			tupleToVec(getField(child, "direction")).normalize(),
 			getField(child, "angle")->getScalar()));
+	} else if (name == "warn_model") {
+		if (child == NULL) {
+			throw ParseError("No info for warn_model");
+		}
+		scene->add(new WarnModel(scene,
+			tupleToVec(getField(child, "position")),
+			tupleToVec(getColorField(child)),
+			tupleToVec(getField(child, "direction")).normalize(),
+			getField(child, "size")->getScalar(),
+			getField(child, "shape")->getScalar()));
 	} else if (name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
