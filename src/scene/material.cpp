@@ -1,6 +1,9 @@
 #include "ray.h"
 #include "material.h"
 #include "light.h"
+#include "../ui/TraceUI.h"
+
+extern TraceUI* traceUI;
 
 // Apply the phong model to this point on the surface of the object, returning
 // the color of that point.
@@ -25,7 +28,13 @@ vec3f Material::shadePhong( Scene *scene, const ray& r, const isect& i ) const
 	
 	// Diffuse and specular term
 	for (list<Light*>::const_iterator p = scene->beginLights(); p != scene->endLights(); ++p) {
-		vec3f atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
+		vec3f atten;
+		if (traceUI->isSoftShadow()) {
+			atten = ((*p)->distanceAttenuation(intersection) * (*p)->softShadowAttenuation(intersection)).clamp();
+		}
+		else {
+			atten = ((*p)->distanceAttenuation(intersection) * (*p)->shadowAttenuation(intersection)).clamp();
+		}
 		vec3f ip = (*p)->getColor(intersection);
 		
 		// Diffuse term
@@ -57,7 +66,7 @@ vec3f Material::shadeToon(Scene* scene, const ray& r, const isect& i) const
 			for (int l = -1; l <= 1; l += 2) {
 				ray tempRay = ray(r.getPosition(), (r.getDirection() + vec3f(0.003 * j, 0.003 * k, 0.003 * l)).normalize());
 				tempIntersect.obj = NULL;
-				(scene->intersect(tempRay, tempIntersect));
+				scene->intersect(tempRay, tempIntersect);
 				if (tempIntersect.obj == NULL) return vec3f(0, 0, 0);
 				if (tempIntersect.obj != i.obj) if (tempIntersect.getMaterial().kd != i.getMaterial().kd) return vec3f(0, 0, 0);
 			}

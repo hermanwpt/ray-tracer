@@ -37,6 +37,8 @@ public:
 	Fl_Light_Button*	m_SSAAButton;
 	Fl_Light_Button*	m_adaptiveSSAAButton;
 	Fl_Light_Button*	m_jitterButton;
+	Fl_Light_Button*	m_glossButton;
+	Fl_Light_Button*	m_softShadowButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -54,6 +56,8 @@ public:
 	bool		isSSAA();
 	bool		isAdaptiveSSAA();
 	bool		isJitter();
+	bool		isGloss();
+	bool		isSoftShadow();
 
 private:
 	RayTracer*	raytracer;
@@ -67,6 +71,8 @@ private:
 	bool		m_nSSAA;
 	bool		m_nAdaptiveSSAA;
 	bool		m_nJitter;
+	bool		m_nGloss;
+	bool		m_nSoftShadow;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -94,6 +100,8 @@ private:
 	static void cb_SSAAButton(Fl_Widget* o, void* v);
 	static void cb_adaptiveSSAAButton(Fl_Widget* o, void* v);
 	static void cb_jitterButton(Fl_Widget* o, void* v);
+	static void cb_glossButton(Fl_Widget* o, void* v);
+	static void cb_softShadowButton(Fl_Widget* o, void* v);
 };
 
 #endif

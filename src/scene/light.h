@@ -8,6 +8,7 @@ class Light
 {
 public:
 	virtual vec3f shadowAttenuation(const vec3f& P) const = 0;
+	virtual vec3f softShadowAttenuation(const vec3f& P) const = 0;
 	virtual double distanceAttenuation( const vec3f& P ) const = 0;
 	virtual vec3f getColor( const vec3f& P ) const = 0;
 	virtual vec3f getDirection( const vec3f& P ) const = 0;
@@ -26,6 +27,7 @@ public:
 	DirectionalLight( Scene *scene, const vec3f& orien, const vec3f& color )
 		: Light( scene, color ), orientation( orien ) {}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual vec3f softShadowAttenuation(const vec3f& P) const;
 	virtual double distanceAttenuation( const vec3f& P ) const;
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
@@ -45,6 +47,7 @@ public:
 		quadAtten = 0.25;
 	}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual vec3f softShadowAttenuation(const vec3f& P) const;
 	virtual double distanceAttenuation( const vec3f& P ) const;
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
