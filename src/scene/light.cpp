@@ -179,7 +179,7 @@ double WarnModel::distanceAttenuation(const vec3f& P) const
 			return 0;
 		break;
 	case 2:
-		if (x * x + y * y > size || (x * x + y * y < size / 1.5))
+		if (x * x + y * y > size || (x * x + y * y < size / 2))
 			return 0;
 		break;
 	case 3:
