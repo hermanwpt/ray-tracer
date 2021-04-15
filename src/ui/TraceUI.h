@@ -39,6 +39,8 @@ public:
 	Fl_Light_Button*	m_jitterButton;
 	Fl_Light_Button*	m_glossButton;
 	Fl_Light_Button*	m_softShadowButton;
+	Fl_Light_Button*	m_DOFButton;
+	Fl_Light_Button*	m_montionBlurButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -58,6 +60,8 @@ public:
 	bool		isJitter();
 	bool		isGloss();
 	bool		isSoftShadow();
+	bool		isDOF();
+	bool		isMotionBlur();
 
 private:
 	RayTracer*	raytracer;
@@ -73,6 +77,8 @@ private:
 	bool		m_nJitter;
 	bool		m_nGloss;
 	bool		m_nSoftShadow;
+	bool		m_nDOF;
+	bool		m_nMotionBlur;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -102,6 +108,8 @@ private:
 	static void cb_jitterButton(Fl_Widget* o, void* v);
 	static void cb_glossButton(Fl_Widget* o, void* v);
 	static void cb_softShadowButton(Fl_Widget* o, void* v);
+	static void cb_DOFButton(Fl_Widget* o, void* v);
+	static void cb_motionBlurButton(Fl_Widget* o, void* v);
 };
 
 #endif
