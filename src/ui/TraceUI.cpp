@@ -241,6 +241,16 @@ void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nJitter = bool(((Fl_Light_Button*)o)->value());
 }
 
+void TraceUI::cb_glossButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nGloss = bool(((Fl_Light_Button*)o)->value());
+}
+
+void TraceUI::cb_softShadowButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nSoftShadow = bool(((Fl_Light_Button*)o)->value());
+}
+
 void TraceUI::show()
 {
 	m_mainWindow->show();
@@ -287,6 +297,16 @@ bool TraceUI::isJitter()
 	return m_nJitter;
 }
 
+bool TraceUI::isGloss()
+{
+	return m_nGloss;
+}
+
+bool TraceUI::isSoftShadow()
+{
+	return m_nSoftShadow;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -317,6 +337,8 @@ TraceUI::TraceUI() {
 	m_nSSAA = false;
 	m_nAdaptiveSSAA = false;
 	m_nJitter = false;
+	m_nGloss = false;
+	m_nSoftShadow = false;
 	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -400,6 +422,22 @@ TraceUI::TraceUI() {
 		m_SSAASlider->align(FL_ALIGN_RIGHT);
 		m_SSAASlider->callback(cb_SSAASlides);
 		m_SSAASlider->deactivate();
+
+		// install button gloss
+		m_glossButton = new Fl_Light_Button(10, 155, 145, 20, "Glossy Reflection");
+		m_glossButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_glossButton->labelfont(FL_COURIER);
+		m_glossButton->labelsize(12);
+		m_glossButton->value(m_nGloss);
+		m_glossButton->callback(cb_glossButton);
+
+		// install button soft shadow
+		m_softShadowButton = new Fl_Light_Button(160, 155, 145, 20, "Soft Shadow");
+		m_softShadowButton->user_data((void*)(this));	// record self to be used by static callback functions
+		m_softShadowButton->labelfont(FL_COURIER);
+		m_softShadowButton->labelsize(12);
+		m_softShadowButton->value(m_nSoftShadow);
+		m_softShadowButton->callback(cb_softShadowButton);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
