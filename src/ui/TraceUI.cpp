@@ -456,13 +456,12 @@ TraceUI::TraceUI() {
 	m_nJitter = false;
 	m_nTextureMapping = false;
 	m_nBumpMapping = false;
-	m_mainWindow = new Fl_Window(100, 40, 320, 200, "Ray <Not Loaded>");
 	m_nGloss = false;
 	m_nSoftShadow = false;
 	m_nDOF = false;
 	m_nMotionBlur = false;
   
-	m_mainWindow = new Fl_Window(100, 40, 320, 260, "Ray <Not Loaded>");
+	m_mainWindow = new Fl_Window(100, 40, 320, 300, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
@@ -606,7 +605,7 @@ TraceUI::TraceUI() {
 		m_focalLengthSlider->callback(cb_focalLengthSlides);
 		m_focalLengthSlider->deactivate();
   
-  	m_textureMappingButton = new Fl_Light_Button(10, 255, 130, 20, "Texture Mapping");
+  		m_textureMappingButton = new Fl_Light_Button(10, 255, 130, 20, "Texture Mapping");
 		m_textureMappingButton->user_data((void*)(this));	// record self to be used by static callback functions
 		m_textureMappingButton->labelfont(FL_COURIER);
 		m_textureMappingButton->labelsize(12);
