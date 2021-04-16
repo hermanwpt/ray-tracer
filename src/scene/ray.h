@@ -31,6 +31,7 @@ public:
 
 	vec3f getPosition() const { return p; }
 	vec3f getDirection() const { return d; }
+    void setPosition(vec3f pp) { p = pp; }
 
 protected:
 	vec3f p;

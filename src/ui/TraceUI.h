@@ -30,6 +30,8 @@ public:
 	Fl_Slider*			m_depthSlider;
 	Fl_Slider*			m_thresholdSlider;
 	Fl_Slider*			m_SSAASlider;
+	Fl_Slider*			m_apertureSizeSlider;
+	Fl_Slider*			m_focalLengthSlider;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
@@ -39,6 +41,10 @@ public:
 	Fl_Light_Button*	m_jitterButton;
 	Fl_Light_Button*	m_textureMappingButton;
 	Fl_Light_Button*	m_bumpMappingButton;
+	Fl_Light_Button*	m_glossButton;
+	Fl_Light_Button*	m_softShadowButton;
+	Fl_Light_Button*	m_DOFButton;
+	Fl_Light_Button*	m_montionBlurButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -50,14 +56,20 @@ public:
 	int			getSize();
 	int			getDepth();
 	int			getSSAASize();
+	int			getApertureSize();
 
 	double		getThreshold();
+	double		getFocalLength();
 
 	bool		isSSAA();
 	bool		isAdaptiveSSAA();
 	bool		isJitter();
 	bool		isTextureMapping();
 	bool		isBumpMapping();
+	bool		isGloss();
+	bool		isSoftShadow();
+	bool		isDOF();
+	bool		isMotionBlur();
 
 private:
 	RayTracer*	raytracer;
@@ -65,14 +77,20 @@ private:
 	int			m_nSize;
 	int			m_nDepth;
 	int			m_nSSAASize;
+	int			m_nApertureSize;
 
 	double		m_nThreshold;
+	double		m_nFocalLength;
 
 	bool		m_nSSAA;
 	bool		m_nAdaptiveSSAA;
 	bool		m_nJitter;
 	bool		m_nTextureMapping;
 	bool		m_nBumpMapping;
+	bool		m_nGloss;
+	bool		m_nSoftShadow;
+	bool		m_nDOF;
+	bool		m_nMotionBlur;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -96,6 +114,8 @@ private:
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_thresholdSlides(Fl_Widget* o, void* v);
 	static void cb_SSAASlides(Fl_Widget* o, void* v);
+	static void cb_apertureSizeSlides(Fl_Widget* o, void* v);
+	static void cb_focalLengthSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
@@ -105,6 +125,10 @@ private:
 	static void cb_jitterButton(Fl_Widget* o, void* v);
 	static void cb_textureMappingButton(Fl_Widget* o, void* v);
 	static void cb_bumpMappingButton(Fl_Widget* o, void* v);
+	static void cb_glossButton(Fl_Widget* o, void* v);
+	static void cb_softShadowButton(Fl_Widget* o, void* v);
+	static void cb_DOFButton(Fl_Widget* o, void* v);
+	static void cb_motionBlurButton(Fl_Widget* o, void* v);
 };
 
 #endif
