@@ -18,3 +18,20 @@ We implemented a CARTOONISH shading model, with the following features:
 	-	Black border around the silhouette of each object, with thickness varying with camera distance (objects closer to the camera have thicker border)
 	-	High constrast color (although the scene will appear brighter in general, originally bright colors becomes disproportionately brighter than originally dim colors)
 	-	Intensity thresholding (e.g. Highlights do not appear as white gradient circles, but rather an entire circle with the same shade of white)
+	
+SpotLight
+- Please load spot_light.ray
+
+WarnModel
+- Please load warn_model.ray
+
+Texture Mapping
+- Please load earth.ray, load Texture worldmap.bmp in asset folder and toggle TextureMapping button.
+
+Bump Mapping
+- Please load earth.ray, load Normal worldmap_normal.bmp in asset folder and toggle BumpMapping button.
+- It is possible to load Texture worldmap.bmp at the same time and see its effect.
+
+Height Field
+- Please load blank.ray, load Height Field hf_512_.bmp, hf_512_grey_.bmp and render.
+- The running time of this function is very long. It is therefore recommended to use smaller size when rendering this.
