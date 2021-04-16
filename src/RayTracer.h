@@ -32,6 +32,7 @@ public:
 	bool loadBackgroundImage( char* fn );
 	bool loadTextureImage( char* fn );
 	bool loadNormalImage( char* fn );
+	bool loadHeightField(char* fn, char* grey);
 
 	void setToggledTexture(bool toggled) { scene->setToggledTexture(toggled); }
 
@@ -48,7 +49,7 @@ private:
 	int bgWidth, bgHeight;
 	int bufferSize;
 	Scene* scene;
-
+	
 	int shader;
 
 	bool m_bSceneLoaded;

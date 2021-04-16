@@ -374,6 +374,37 @@ bool RayTracer::loadNormalImage(char* fn)
 	return true;
 }
 
+bool RayTracer::loadHeightField(char* fn1, char* fn2)
+{
+	unsigned char* colorMap;
+	unsigned char* greyMap;
+	int	cwidth, cheight, gwidth, gheight;
+
+	// Attempt to read file
+	if ((colorMap = readBMP(fn1, cwidth, cheight)) == NULL) {
+		fl_alert("Can't load bitmap file (color map)");
+		return false;
+	}
+
+	if ((greyMap = readBMP(fn2, gwidth, gheight)) == NULL) {
+		fl_alert("Can't load bitmap file (grey map)");
+		return false;
+	}
+
+	if (cwidth != gwidth || cheight != gheight) {
+		fl_alert("Color Map & Grey Map Different Dimensions");
+		return false;
+	}
+
+	// Update background image size
+	scene->setHFColorMap(colorMap, cwidth, cheight);
+	scene->setHFGreyMap(greyMap, gwidth, gheight);
+
+	scene->createMesh();
+
+	return true;
+}
+
 void RayTracer::setShader(int s)
 {
 	shader = s;

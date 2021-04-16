@@ -80,6 +80,16 @@ void TraceUI::cb_load_normal_image(Fl_Menu_* o, void* v)
 	}
 }
 
+void TraceUI::cb_load_height_field(Fl_Menu_* o, void* v)
+{
+	TraceUI* pUI = whoami(o);
+	char* colorN = fl_file_chooser("Open File Height Field Color Map?", "*.bmp", "");
+	char* greyN = fl_file_chooser("Open File Height Field Grey Map?", "*.bmp", "");
+	if (colorN != NULL && greyN != NULL) {
+		pUI->raytracer->loadHeightField(colorN, greyN);
+	}
+}
+
 void TraceUI::cb_exit(Fl_Menu_* o, void* v)
 {
 	TraceUI* pUI=whoami(o);
@@ -348,7 +358,8 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image, 0, FL_MENU_DIVIDER },
 		{ "&Load Background Image...", FL_ALT + 'b', (Fl_Callback *)TraceUI::cb_load_background_image, 0, }, 
 		{ "&Load Texture Image...", FL_ALT + 't', (Fl_Callback*)TraceUI::cb_load_texture_image, 0 },
-		{ "&Load Normal Image...", FL_ALT + 'n', (Fl_Callback*)TraceUI::cb_load_normal_image, 0, FL_MENU_DIVIDER },
+		{ "&Load Normal Image...", FL_ALT + 'n', (Fl_Callback*)TraceUI::cb_load_normal_image, 0 },
+		{ "&Load Height Field...", FL_ALT + 'h', (Fl_Callback*)TraceUI::cb_load_height_field, 0, FL_MENU_DIVIDER },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 

@@ -176,3 +176,8 @@ Trimesh::generateNormals()
     delete [] numFaces;
 }
 
+void Trimesh::addFacesNonbound() {
+    for (int i = 0; i < faces.size(); i++) {
+        scene->nonboundedobjects.push_back(faces.at(i));
+    }
+}
