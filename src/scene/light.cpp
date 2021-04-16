@@ -34,6 +34,25 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 	return atten;
 }
 
+vec3f DirectionalLight::softShadowAttenuation(const vec3f& P) const
+{
+	vec3f tempAtten = vec3f(0, 0, 0);
+
+	// I don't even know what I'm doing at this point
+	// I'm basically forcing the raytracer to trace more than one shadow rays by defining 8 imaginary light sources per light source
+	// I guess this counts as a kind of distributed forward raytracing???
+	for (int j = -1; j <= 1; j += 2) {
+		for (int k = -1; k <= 1; k += 2) {
+			for (int l = -1; l <= 1; l += 2) {
+				DirectionalLight tempLight = DirectionalLight(scene, orientation + vec3f(0.01 * j * rand() / RAND_MAX, 0.01 * k * rand() / RAND_MAX, 0.01 * l * rand() / RAND_MAX), color);
+				tempAtten += tempLight.shadowAttenuation(P);
+			}
+		}
+	}
+	// tempAtten += shadowAttenuation(P);	// Also attenuating the original shadow looks odd
+	return tempAtten / 8;
+}
+
 vec3f DirectionalLight::getColor( const vec3f& P ) const
 {
 	// Color doesn't depend on P 
@@ -104,6 +123,25 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 	}
 
 	return atten;
+}
+
+vec3f PointLight::softShadowAttenuation(const vec3f& P) const
+{
+	vec3f tempAtten = vec3f(0, 0, 0);
+
+	// I don't even know what I'm doing at this point
+	// I'm basically forcing the raytracer to trace more than one shadow rays by defining 8 imaginary light sources per light source
+	// I guess this counts as a kind of distributed forward raytracing???
+	for (int j = -1; j <= 1; j += 2) {
+		for (int k = -1; k <= 1; k += 2) {
+			for (int l = -1; l <= 1; l += 2) {
+				PointLight tempLight = PointLight(scene, position + vec3f(0.1 * j * rand() / RAND_MAX, 0.1 * k * rand() / RAND_MAX, 0.1 * l * rand() / RAND_MAX), color);
+				tempAtten += tempLight.shadowAttenuation(P);
+			}
+		}
+	}
+	// tempAtten += shadowAttenuation(P);	// Also attenuating the original shadow looks odd
+	return tempAtten / 8;
 }
 
 double SpotLight::distanceAttenuation(const vec3f& P) const

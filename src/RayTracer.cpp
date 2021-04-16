@@ -22,7 +22,24 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0 ).clamp();
+	// OpenGL transforms the entire scene to implement "camera movement"
+	// Likewise, we can transform the camera (or rather, all the rays beamed from the view plane) to implement "scene movement"
+	// Applying the same transformation to every ray from the view plane in each iteration is like moving the entire scene (hence simulating "movement")
+	if (traceUI->isMotionBlur()) {
+		vec3f intensity = vec3f(0, 0, 0);
+		for (int i = 0; i < 25; ++i) {
+			// Only rotate the camera in x-axis because doing all 3 axes at once is VERY blurry
+			ray tempRay = ray(r.getPosition(), (r.getDirection() + vec3f(0.004 * i, 0, 0)).normalize());
+			intensity += traceRay(scene, tempRay, vec3f(1.0, 1.0, 1.0), 0).clamp();
+		}
+		return intensity / 25;
+	} else if (traceUI->isDOF()) {
+		vec3f intensity = vec3f(0, 0, 0);
+
+		return intensity;
+	} else {
+		return traceRay(scene, r, vec3f(1.0, 1.0, 1.0), 0).clamp();
+	}
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -43,6 +60,7 @@ vec3f RayTracer::traceRayPhong(Scene* scene, const ray& r,
 	isect i;
 
 	if (scene->intersect(r, i)) {
+		printf("%f, %f, %f\n", r.at(i.t)[0], r.at(i.t)[1], r.at(i.t)[2]);
 		// YOUR CODE HERE
 
 		// An intersection occured!  We've got work to do.  For now,
@@ -67,8 +85,25 @@ vec3f RayTracer::traceRayPhong(Scene* scene, const ray& r,
 		// Reflected ray
 		if (!m.kr.iszero()) {
 			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
-			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
-			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			if (traceUI->isGloss()) {
+				vec3f ir = vec3f(0, 0, 0);
+				for (int j = -1; j <= 1; j += 2) {
+					for (int k = -1; k <= 1; k += 2) {
+						for (int l = -1; l <= 1; l += 2) {
+							vec3f distributeDir = (reflectDir + vec3f(0.06 * j * rand() / RAND_MAX, 0.06 * k * rand() / RAND_MAX, 0.06 * l * rand() / RAND_MAX)).normalize();
+							vec3f tempir = traceRay(scene, ray(intersection, distributeDir), thresh, depth + 1);
+							ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+						}
+					}
+				}
+				// vec3f tempir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);	// Also doing the original reflection makes the image look odd tbh
+				// ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+				intensity += ir / 8;
+			}
+			else {
+				vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+				intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			}
 		}
 
 		// Refracted ray
@@ -165,8 +200,25 @@ vec3f RayTracer::traceRayToon(Scene* scene, const ray& r,
 		// Reflected ray
 		if (!m.kr.iszero()) {
 			vec3f reflectDir = (2 * (-r.getDirection()).dot(i.N) * i.N - (-r.getDirection())).normalize();
-			vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
-			intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			if (traceUI->isGloss()) {
+				vec3f ir = vec3f(0, 0, 0);
+				for (int j = -1; j <= 1; j += 2) {
+					for (int k = -1; k <= 1; k += 2) {
+						for (int l = -1; l <= 1; l += 2) {
+							vec3f distributeDir = (reflectDir + vec3f(0.06 * j * rand() / RAND_MAX, 0.06 * k * rand() / RAND_MAX, 0.06 * l * rand() / RAND_MAX)).normalize();
+							vec3f tempir = traceRay(scene, ray(intersection, distributeDir), thresh, depth + 1);
+							ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+						}
+					}
+				}
+				// vec3f tempir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);	// Also doing the original reflection makes the image look odd tbh
+				// ir += vec3f(m.kr[0] * tempir[0], m.kr[1] * tempir[1], m.kr[2] * tempir[2]);
+				intensity += ir / 8;
+			}
+			else {
+				vec3f ir = traceRay(scene, ray(intersection, reflectDir), thresh, depth + 1);
+				intensity += vec3f(m.kr[0] * ir[0], m.kr[1] * ir[1], m.kr[2] * ir[2]);
+			}
 		}
 
 		// Refracted ray
@@ -465,7 +517,7 @@ void RayTracer::tracePixel( int i, int j )
 		}
 		col = col / (n * n);
 	} else if (traceUI->isAdaptiveSSAA()) {
-
+		col = trace(scene, x, y); // Placeholder
 	} else {
 		col = trace(scene, x, y);
 	}
