@@ -98,6 +98,11 @@ vec3f Camera::getLook()
     return look;
 }
 
+vec3f Camera::getEye()
+{
+    return eye;
+}
+
 void
 Camera::update()
 {

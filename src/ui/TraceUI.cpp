@@ -123,6 +123,16 @@ void TraceUI::cb_SSAASlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nSSAASize = int(((Fl_Slider*)o)->value());
 }
 
+void TraceUI::cb_apertureSizeSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nApertureSize = int(((Fl_Slider*)o)->value());
+}
+
+void TraceUI::cb_focalLengthSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nFocalLength = double(((Fl_Slider*)o)->value());
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -253,7 +263,15 @@ void TraceUI::cb_softShadowButton(Fl_Widget* o, void* v)
 
 void TraceUI::cb_DOFButton(Fl_Widget* o, void* v)
 {
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
 	((TraceUI*)(o->user_data()))->m_nDOF = bool(((Fl_Light_Button*)o)->value());
+	if (pUI->m_nDOF) {
+		pUI->m_apertureSizeSlider->activate();
+		pUI->m_focalLengthSlider->activate();
+	} else {
+		pUI->m_apertureSizeSlider->deactivate();
+		pUI->m_focalLengthSlider->deactivate();
+	}
 }
 
 void TraceUI::cb_motionBlurButton(Fl_Widget* o, void* v)
@@ -287,9 +305,19 @@ int TraceUI::getSSAASize()
 	return m_nSSAASize;
 }
 
+int TraceUI::getApertureSize()
+{
+	return m_nApertureSize;
+}
+
 double TraceUI::getThreshold()
 {
 	return m_nThreshold;
+}
+
+double TraceUI::getFocalLength()
+{
+	return m_nFocalLength;
 }
 
 bool TraceUI::isSSAA()
@@ -353,7 +381,9 @@ TraceUI::TraceUI() {
 	m_nDepth = 0;
 	m_nSize = 150;
 	m_nSSAASize = 1;
+	m_nApertureSize = 2;
 	m_nThreshold = 0.0;
+	m_nFocalLength = 2.50;
 	m_nSSAA = false;
 	m_nAdaptiveSSAA = false;
 	m_nJitter = false;
@@ -361,7 +391,7 @@ TraceUI::TraceUI() {
 	m_nSoftShadow = false;
 	m_nDOF = false;
 	m_nMotionBlur = false;
-	m_mainWindow = new Fl_Window(100, 40, 320, 240, "Ray <Not Loaded>");
+	m_mainWindow = new Fl_Window(100, 40, 320, 260, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
@@ -476,6 +506,34 @@ TraceUI::TraceUI() {
 		m_softShadowButton->labelsize(12);
 		m_softShadowButton->value(m_nMotionBlur);
 		m_softShadowButton->callback(cb_motionBlurButton);
+
+		// install slider aperture size
+		m_apertureSizeSlider = new Fl_Value_Slider(10, 205, 180, 20, "Aperture Size");
+		m_apertureSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_apertureSizeSlider->type(FL_HOR_NICE_SLIDER);
+		m_apertureSizeSlider->labelfont(FL_COURIER);
+		m_apertureSizeSlider->labelsize(12);
+		m_apertureSizeSlider->minimum(1);
+		m_apertureSizeSlider->maximum(5);
+		m_apertureSizeSlider->step(1);
+		m_apertureSizeSlider->value(m_nApertureSize);
+		m_apertureSizeSlider->align(FL_ALIGN_RIGHT);
+		m_apertureSizeSlider->callback(cb_apertureSizeSlides);
+		m_apertureSizeSlider->deactivate();
+
+		// install slider focal length
+		m_focalLengthSlider = new Fl_Value_Slider(10, 230, 180, 20, "Focal Length");
+		m_focalLengthSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_focalLengthSlider->type(FL_HOR_NICE_SLIDER);
+		m_focalLengthSlider->labelfont(FL_COURIER);
+		m_focalLengthSlider->labelsize(12);
+		m_focalLengthSlider->minimum(1.0);
+		m_focalLengthSlider->maximum(5.0);
+		m_focalLengthSlider->step(0.01);
+		m_focalLengthSlider->value(m_nFocalLength);
+		m_focalLengthSlider->align(FL_ALIGN_RIGHT);
+		m_focalLengthSlider->callback(cb_focalLengthSlides);
+		m_focalLengthSlider->deactivate();
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
