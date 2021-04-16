@@ -562,6 +562,25 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			throw ParseError("No info for ambient_light");
 		}
 		scene->setAmbientIntensity(tupleToVec(getField(child, "color")));
+	} else if (name == "spot_light") {
+		if (child == NULL) {
+			throw ParseError("No info for spot_light");
+		}
+		scene->add(new SpotLight(scene, 
+			tupleToVec(getField(child, "position")), 
+			tupleToVec(getColorField(child)),
+			tupleToVec(getField(child, "direction")).normalize(),
+			getField(child, "angle")->getScalar()));
+	} else if (name == "warn_model") {
+		if (child == NULL) {
+			throw ParseError("No info for warn_model");
+		}
+		scene->add(new WarnModel(scene,
+			tupleToVec(getField(child, "position")),
+			tupleToVec(getColorField(child)),
+			tupleToVec(getField(child, "direction")).normalize(),
+			getField(child, "size")->getScalar(),
+			getField(child, "shape")->getScalar()));
 	} else if (name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||

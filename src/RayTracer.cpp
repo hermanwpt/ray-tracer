@@ -308,6 +308,7 @@ RayTracer::RayTracer()
 RayTracer::~RayTracer()
 {
 	delete [] buffer;
+	if (bg) delete[] bg;
 	delete scene;
 }
 
@@ -385,6 +386,73 @@ bool RayTracer::loadBackgroundImage(char* fn)
 	bgHeight = height;
 
 	bg = data;
+
+	return true;
+}
+
+bool RayTracer::loadTextureImage(char* fn)
+{
+	unsigned char* data;
+	unsigned char* another_data;
+	int	width, height;
+
+	// Attempt to read file
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		return false;
+	}
+
+	// Update background image size
+	scene->setTextureData(data, width, height);
+
+	return true;
+}
+
+bool RayTracer::loadNormalImage(char* fn)
+{
+	unsigned char* data;
+	unsigned char* another_data;
+	int	width, height;
+
+	// Attempt to read file
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		return false;
+	}
+
+	// Update background image size
+	scene->setNormalData(data, width, height);
+
+	return true;
+}
+
+bool RayTracer::loadHeightField(char* fn1, char* fn2)
+{
+	unsigned char* colorMap;
+	unsigned char* greyMap;
+	int	cwidth, cheight, gwidth, gheight;
+
+	// Attempt to read file
+	if ((colorMap = readBMP(fn1, cwidth, cheight)) == NULL) {
+		fl_alert("Can't load bitmap file (color map)");
+		return false;
+	}
+
+	if ((greyMap = readBMP(fn2, gwidth, gheight)) == NULL) {
+		fl_alert("Can't load bitmap file (grey map)");
+		return false;
+	}
+
+	if (cwidth != gwidth || cheight != gheight) {
+		fl_alert("Color Map & Grey Map Different Dimensions");
+		return false;
+	}
+
+	// Update background image size
+	scene->setHFColorMap(colorMap, cwidth, cheight);
+	scene->setHFGreyMap(greyMap, gwidth, gheight);
+
+	scene->createMesh();
 
 	return true;
 }

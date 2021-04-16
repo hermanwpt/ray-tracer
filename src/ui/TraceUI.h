@@ -39,6 +39,8 @@ public:
 	Fl_Light_Button*	m_SSAAButton;
 	Fl_Light_Button*	m_adaptiveSSAAButton;
 	Fl_Light_Button*	m_jitterButton;
+	Fl_Light_Button*	m_textureMappingButton;
+	Fl_Light_Button*	m_bumpMappingButton;
 	Fl_Light_Button*	m_glossButton;
 	Fl_Light_Button*	m_softShadowButton;
 	Fl_Light_Button*	m_DOFButton;
@@ -62,6 +64,8 @@ public:
 	bool		isSSAA();
 	bool		isAdaptiveSSAA();
 	bool		isJitter();
+	bool		isTextureMapping();
+	bool		isBumpMapping();
 	bool		isGloss();
 	bool		isSoftShadow();
 	bool		isDOF();
@@ -81,6 +85,8 @@ private:
 	bool		m_nSSAA;
 	bool		m_nAdaptiveSSAA;
 	bool		m_nJitter;
+	bool		m_nTextureMapping;
+	bool		m_nBumpMapping;
 	bool		m_nGloss;
 	bool		m_nSoftShadow;
 	bool		m_nDOF;
@@ -94,6 +100,9 @@ private:
 	static void cb_load_scene(Fl_Menu_* o, void* v);
 	static void cb_save_image(Fl_Menu_* o, void* v);
 	static void cb_load_background_image(Fl_Menu_* o, void* v);
+	static void cb_load_texture_image(Fl_Menu_* o, void* v);
+	static void cb_load_normal_image(Fl_Menu_* o, void* v);
+	static void cb_load_height_field(Fl_Menu_* o, void* v);
 	static void cb_exit(Fl_Menu_* o, void* v);
 	static void cb_set_shader_phong(Fl_Menu_* o, void* v);
 	static void cb_set_shader_toon(Fl_Menu_* o, void* v);
@@ -114,6 +123,8 @@ private:
 	static void cb_SSAAButton(Fl_Widget* o, void* v);
 	static void cb_adaptiveSSAAButton(Fl_Widget* o, void* v);
 	static void cb_jitterButton(Fl_Widget* o, void* v);
+	static void cb_textureMappingButton(Fl_Widget* o, void* v);
+	static void cb_bumpMappingButton(Fl_Widget* o, void* v);
 	static void cb_glossButton(Fl_Widget* o, void* v);
 	static void cb_softShadowButton(Fl_Widget* o, void* v);
 	static void cb_DOFButton(Fl_Widget* o, void* v);

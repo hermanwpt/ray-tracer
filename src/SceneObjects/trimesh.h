@@ -38,7 +38,8 @@ public:
 
     char *doubleCheck();
     
-    void generateNormals();
+    void generateNormals(); 
+    void addFacesNonbound();
 };
 
 class TrimeshFace : public MaterialSceneObject

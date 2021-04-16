@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "light.h"
 #include "../ui/TraceUI.h"
+#include "../SceneObjects/trimesh.h"
 extern TraceUI* traceUI;
 
 void BoundingBox::operator=(const BoundingBox& target)
@@ -135,6 +136,11 @@ Scene::~Scene()
 	for( l = lights.begin(); l != lights.end(); ++l ) {
 		delete (*l);
 	}
+
+	if (texture)
+		delete[] texture;
+	if (bumpMap)
+		delete[] bumpMap;
 }
 
 vec3f Scene::getAmbientIntensity()
@@ -208,4 +214,77 @@ void Scene::initScene()
 		else
 			nonboundedobjects.push_back(*j);
 	}
+}
+
+void Scene::setTextureData(unsigned char* texture, int width, int height)
+{ 
+	this->texture = texture;
+	this->textureWidth = width;
+	this->textureHeight = height;
+}
+
+void Scene::setNormalData(unsigned char* normal, int width, int height) 
+{ 
+	this->bumpMap = normal;
+	this->bumpMapWidth = width;
+	this->bumpMapHeight = height;
+}
+
+void Scene::setHFColorMap(unsigned char* m, int width, int height)
+{
+	this->HFcolorMap = m;
+	this->HFcolorMapWidth = width;
+	this->HFcolorMapHeight = height;
+}
+
+void Scene::setHFGreyMap(unsigned char* m, int width, int height)
+{
+	this->HFgreyMap = m;
+	this->HFgreyMapWidth = width;
+	this->HFgreyMapHeight = height;
+}
+
+void Scene::createMesh()
+{
+	Material* mat = new Material();
+	TransformNode* transform = new TransformRoot();
+
+	Trimesh* tmesh = new Trimesh(this, mat, transform);
+	 
+	int width = HFcolorMapWidth, height = HFcolorMapHeight;
+	double dx = 2.0 / static_cast<double>(width), dz = 2.0 / static_cast<double>(height);
+
+	// compute height at each vertex, add all vertex. compute color, add all material
+	double posX = 0.0, posY = 0.0, posZ = 0.0;
+	Material* material;
+	for (int z = 0; z < height; z++) {
+		for (int x = 0; x < width; x++) {
+			// vertex & height
+			posY = static_cast<double>(HFgreyMap[z * width + x]) / 255.0f;
+			tmesh->addVertex(vec3f{ posX, posY, posZ });
+
+			// material & color
+			material = new Material{};
+			material->kd = vec3f{ HFcolorMap[(z * width + x) * 3] / 255.0f, HFcolorMap[(z * width + x) * 3 + 1] / 255.0f, HFcolorMap[(z * width + x) * 3 + 2] / 255.0f };
+			tmesh->addMaterial(material);
+			
+			// next vertex along x
+			posX += dx;
+		}
+		// next vertex along z
+		posX = 0;
+		posZ += dz;
+	}
+
+	// add face, 2 faces per each square
+	for (int y = 0; y < height - 1; y++) {
+		for (int x = 0; x < width - 1; x++) {
+			tmesh->addFace(y * width + x, (y + 1) * width + x, y * width + x + 1);
+			tmesh->addFace((y + 1) * width + x, (y + 1) * width + x + 1, y * width + x + 1);
+		}
+	}
+
+	tmesh->generateNormals();
+	boundedobjects.push_back(tmesh);
+	tmesh->addFacesNonbound();
 }
