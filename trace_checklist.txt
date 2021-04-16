@@ -25,5 +25,5 @@ BW Warn model					yes
 3B high lever geometry (e.g. metaballs)		no
 3B ray-intersection optimization		no
 4B realistic shading model			yes
-4B CSG						yes/no
+4B CSG						no
 4B caustics					no
