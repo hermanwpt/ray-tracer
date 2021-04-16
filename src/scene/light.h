@@ -73,6 +73,7 @@ public:
 		quadAtten = 0.25;
 	}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual vec3f softShadowAttenuation(const vec3f& P) const { return vec3f{ 0,0,0 }; }
 	virtual double distanceAttenuation(const vec3f& P) const;
 	virtual vec3f getColor(const vec3f& P) const;
 	virtual vec3f getDirection(const vec3f& P) const;
@@ -120,6 +121,7 @@ public:
 		matrix = projection * rotation * translation;
 	}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual vec3f softShadowAttenuation(const vec3f& P) const { return vec3f{ 0,0,0 }; }
 	virtual double distanceAttenuation(const vec3f& P) const;
 	virtual vec3f getColor(const vec3f& P) const;
 	virtual vec3f getDirection(const vec3f& P) const;
