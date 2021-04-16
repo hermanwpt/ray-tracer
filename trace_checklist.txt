@@ -11,19 +11,19 @@ W antialiasing by supersampling			yes
 B spot lights					yes
 B background image				yes
 B accelerate shadow atteuation			yes
-B overlapping tranparent objects		yes/no
+B overlapping tranparent objects		no
 BW texture mapping (diffuse and transparent)	yes
 BW antialiasing by adaptive supersampling	no
 BW Warn model					yes
 2B bump mapping					yes
-2B solid/procedural texture			yes/no
-2B new geometry (quadrics)			yes/no
+2B solid/procedural texture			no
+2B new geometry (quadrics)			no
 2B height fields				yes
 2B first 					yes
 1W next for each Dof, soft shadows, 		yes (soft shadows & motion blur & glossy reflection)
    motion blur, glossy reflection
-3B high lever geometry (e.g. metaballs)		yes/no
-3B ray-intersection optimization		yes/no
+3B high lever geometry (e.g. metaballs)		no
+3B ray-intersection optimization		no
 4B realistic shading model			yes
 4B CSG						yes/no
-4B caustics					yes/no
+4B caustics					no
