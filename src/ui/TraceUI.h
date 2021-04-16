@@ -84,6 +84,7 @@ private:
 	static void cb_load_background_image(Fl_Menu_* o, void* v);
 	static void cb_load_texture_image(Fl_Menu_* o, void* v);
 	static void cb_load_normal_image(Fl_Menu_* o, void* v);
+	static void cb_load_height_field(Fl_Menu_* o, void* v);
 	static void cb_exit(Fl_Menu_* o, void* v);
 	static void cb_set_shader_phong(Fl_Menu_* o, void* v);
 	static void cb_set_shader_toon(Fl_Menu_* o, void* v);

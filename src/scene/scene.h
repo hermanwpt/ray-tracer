@@ -243,6 +243,7 @@ protected:
 class Scene
 {
 public:
+	friend class Trimesh;
 	typedef list<Light*>::iterator 			liter;
 	typedef list<Light*>::const_iterator 	cliter;
 
@@ -278,33 +279,27 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
-	// set data
 
+	// Texture Mapping
 	void setTextureData(unsigned char* texture, int width, int height);
-
-	void setNormalData(unsigned char* normal, int width, int height);
-
 	void setToggledTexture(bool toggled) { toggledTexture = toggled; }
-
-	void setToggledNormal(bool toggled) { toggledNormal = toggled; }
-
-	// Accessor Member Functions
-
 	unsigned char* getTexture() const { return texture; }
-
 	int getTextureWidth() const { return textureWidth; }
-
 	int getTextureHeight() const { return textureHeight; }
-
 	bool mappingTexture() const { return toggledTexture; }
 
+	// Bump Mapping
+	void setNormalData(unsigned char* normal, int width, int height);
+	void setToggledNormal(bool toggled) { toggledNormal = toggled; }
 	unsigned char* getBumpMap() const { return bumpMap; }
-
 	int getBumpMapWidth() const { return bumpMapWidth; }
-
 	int getBumpMapHeight() const { return bumpMapHeight; }
-
 	bool hasNormalImg() const { return toggledNormal; }
+
+	// HF
+	void setHFColorMap(unsigned char* HFColorMap, int width, int height);
+	void setHFGreyMap(unsigned char* HFGreyMap, int width, int height);
+	void createMesh();
 
 private:
     list<Geometry*> objects;
@@ -320,13 +315,21 @@ private:
 	// are exempt from this requirement.
 	BoundingBox sceneBounds;
 
+	// texture mapping
 	unsigned char* texture = NULL;
 	int textureWidth = -1, textureHeight = -1;
 	bool toggledTexture = false;
 
+	// bump mapping
 	unsigned char* bumpMap = NULL;
 	int bumpMapWidth = -1, bumpMapHeight = -1;
 	bool toggledNormal = false;
+
+	// hf
+	unsigned char* HFcolorMap = NULL;
+	int HFcolorMapWidth = -1, HFcolorMapHeight = -1;
+	unsigned char* HFgreyMap = NULL;
+	int HFgreyMapWidth = -1, HFgreyMapHeight = -1;
 };
 
 #endif // __SCENE_H__
