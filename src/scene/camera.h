@@ -19,6 +19,7 @@ public:
     vec3f getU();
     vec3f getV();
     vec3f getLook();
+    vec3f getEye();
 
 private:
     mat3f m;                     // rotation matrix
