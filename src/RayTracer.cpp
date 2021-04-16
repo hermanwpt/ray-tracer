@@ -34,7 +34,9 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 		}
 		return intensity / 25;
 	} else if (traceUI->isDOF()) {
+		vec3f intensity = vec3f(0, 0, 0);
 
+		return intensity;
 	} else {
 		return traceRay(scene, r, vec3f(1.0, 1.0, 1.0), 0).clamp();
 	}
@@ -58,6 +60,7 @@ vec3f RayTracer::traceRayPhong(Scene* scene, const ray& r,
 	isect i;
 
 	if (scene->intersect(r, i)) {
+		printf("%f, %f, %f\n", r.at(i.t)[0], r.at(i.t)[1], r.at(i.t)[2]);
 		// YOUR CODE HERE
 
 		// An intersection occured!  We've got work to do.  For now,
@@ -446,7 +449,7 @@ void RayTracer::tracePixel( int i, int j )
 		}
 		col = col / (n * n);
 	} else if (traceUI->isAdaptiveSSAA()) {
-
+		col = trace(scene, x, y); // Placeholder
 	} else {
 		col = trace(scene, x, y);
 	}
