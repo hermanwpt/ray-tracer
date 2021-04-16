@@ -78,6 +78,7 @@ vec3f Sphere::mapTexture(const vec3f& intersection, unsigned char* texture, cons
 // https://web.eecs.umich.edu/~sugih/courses/eecs487/lectures/26-BumpMap+ProcTex.pdf
 // https://en.wikipedia.org/wiki/Normal_mapping
 
+// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
 vec3f Sphere::mapBumpTexture(const ray& ray, const isect& isect, const vec3f& intersection, unsigned char* bumpMap, const int& width, const int& height) const
 {
 	// Sp, Se, Sn
@@ -114,19 +115,21 @@ vec3f Sphere::mapBumpTexture(const ray& ray, const isect& isect, const vec3f& in
 	int index = (y * width + x) * 3;
 	vec3f normal { static_cast<double>(bumpMap[r]), static_cast<double>(bumpMap[g]), static_cast<double>(bumpMap[b]) };
 
-	vec3f X = (sp.cross(sn)).normalize();
-	vec3f Y = (X.cross(sn)).normalize();
+	// Calculate TBN
+	vec3f T = (sp.cross(sn)).normalize();
+	vec3f B = (T.cross(sn)).normalize();
 
-	mat4f rotation{ vec4f{ X[0], X[1], X[2], 0 },
-					vec4f{ Y[0], Y[1], Y[2], 0 },
+	mat4f TBN{ vec4f{ T[0], T[1], T[2], 0 },
+					vec4f{ B[0], B[1], B[2], 0 },
 					vec4f{ sn[0], sn[1], sn[2], 0},
 					vec4f{ 0.0, 0.0, 0.0, 1.0} };
 
-	vec3f diff = isect.N - vec3f{ 0,0,1 };
-
-	// Adjust R and G values from the bump map to [-1,1]
+	// OPENGL: normal = normal * 2.0 - 1.0;
+	// Adjust normal values from the bump map to [-1,1]
 	normal[0] = (normal[0] / 255.0f) * 2 - 1;
 	normal[1] = (normal[1] / 255.0f) * 2 - 1;
-	normal[2] = normal[2] / 255.0f;
-	return (rotation * normal).normalize();
+	normal[2] = (normal[2] / 255.0f) * 2 - 1;
+
+	// OPENGL: normal = normalize(fs_in.TBN * normal); 
+	return (TBN * normal).normalize();
 }
