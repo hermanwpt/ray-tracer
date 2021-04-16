@@ -8,17 +8,17 @@ Delete yes/no when appropriate
 W adaptive termination				yes
 W antialiasing by supersampling			yes
 +W jittering					yes
-B spot lights					yes/no
+B spot lights					yes
 B background image				yes
 B accelerate shadow atteuation			yes
 B overlapping tranparent objects		yes/no
-BW texture mapping (diffuse and transparent)	yes/no
+BW texture mapping (diffuse and transparent)	yes
 BW antialiasing by adaptive supersampling	no
-BW Warn model					yes/no
-2B bump mapping					yes/no
+BW Warn model					yes
+2B bump mapping					yes
 2B solid/procedural texture			yes/no
 2B new geometry (quadrics)			yes/no
-2B height fields				yes/no
+2B height fields				yes
 2B first 					yes
 1W next for each Dof, soft shadows, 		yes (soft shadows & motion blur & glossy reflection)
    motion blur, glossy reflection
