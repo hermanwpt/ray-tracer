@@ -30,6 +30,8 @@ public:
 	Fl_Slider*			m_depthSlider;
 	Fl_Slider*			m_thresholdSlider;
 	Fl_Slider*			m_SSAASlider;
+	Fl_Slider*			m_apertureSizeSlider;
+	Fl_Slider*			m_focalLengthSlider;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
@@ -52,8 +54,10 @@ public:
 	int			getSize();
 	int			getDepth();
 	int			getSSAASize();
+	int			getApertureSize();
 
 	double		getThreshold();
+	double		getFocalLength();
 
 	bool		isSSAA();
 	bool		isAdaptiveSSAA();
@@ -69,8 +73,10 @@ private:
 	int			m_nSize;
 	int			m_nDepth;
 	int			m_nSSAASize;
+	int			m_nApertureSize;
 
 	double		m_nThreshold;
+	double		m_nFocalLength;
 
 	bool		m_nSSAA;
 	bool		m_nAdaptiveSSAA;
@@ -99,6 +105,8 @@ private:
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_thresholdSlides(Fl_Widget* o, void* v);
 	static void cb_SSAASlides(Fl_Widget* o, void* v);
+	static void cb_apertureSizeSlides(Fl_Widget* o, void* v);
+	static void cb_focalLengthSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
